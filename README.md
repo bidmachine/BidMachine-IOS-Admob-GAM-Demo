@@ -1,6 +1,6 @@
 ![BidMachine iOS](https://appodeal-ios.s3-us-west-1.amazonaws.com/docs/bidmachine.png)
 
-# BidMachine-IOS-Admob-GAM-Demo
+# BidMachine-IOS-GAM-Demo
 
 - [Getting Started](#user-content-getting-started)
 - [Initialize sdk](#user-content-initialize-sdk)
@@ -66,7 +66,7 @@ self.bannerRequest = [BDMBannerRequest new];
 
 ```
 
-After loading the request, you need to load AdMob ad with BidMachine request parameters.
+After loading the request, you need to load GAM ad with BidMachine request parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
 
 
@@ -138,7 +138,7 @@ self.interstitialRequest = [BDMInterstitialRequest new];
 
 ```
 
-After loading the request, you need to load AdMob ad with BidMachine request parameters.
+After loading the request, you need to load GAM with BidMachine request parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
 
 
@@ -213,7 +213,7 @@ self.rewardedRequest = [BDMRewardedRequest new];
 
 ```
 
-After loading the request, you need to load AdMob ad with BidMachine request parameters.
+After loading the request, you need to load GAM ad with BidMachine request parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
 
 
