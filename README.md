@@ -73,6 +73,7 @@ First you need to load ad from BidMachine
 
 After loading the ad, you need to load GAM ad with BidMachine ad parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
+
 > **_WARNING:_** GAM request params should contains price with x.xx format
 
 
@@ -153,6 +154,7 @@ First you need to load ad from BidMachine
 
 After loading the ad, you need to load GAM with BidMachine ad parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
+
 > **_WARNING:_** GAM request params should contains price with x.xx format
 
 
@@ -236,6 +238,7 @@ First you need to load ad from BidMachine
 
 After loading the request, you need to load GAM ad with BidMachine request parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
+
 > **_WARNING:_** GAM request params should contains price with x.xx format
 
 
