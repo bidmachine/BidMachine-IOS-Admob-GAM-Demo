@@ -64,3 +64,19 @@
 }
 
 @end
+
+@implementation Base (Rounding)
+
+- (NSNumberFormatter *)formatter {
+    static NSNumberFormatter *roundingFormater = nil;
+    if (!roundingFormater) {
+        roundingFormater = [NSNumberFormatter new];
+        roundingFormater.numberStyle = NSNumberFormatterDecimalStyle;
+        roundingFormater.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        roundingFormater.roundingMode = NSNumberFormatterRoundCeiling;
+        roundingFormater.positiveFormat = @"0.00";
+    }
+    return roundingFormater;
+}
+
+@end

@@ -8,11 +8,10 @@
 
 #define UNIT_ID         "/91759738/bm_banner"
 
-@interface Banner ()<BDMBannerDelegate, BDMRequestDelegate, GADBannerViewDelegate, GADAppEventDelegate>
+@interface Banner ()<BidMachineAdDelegate, GADBannerViewDelegate, GADAppEventDelegate>
 
-@property (nonatomic, strong) BDMBannerView *banner;
-@property (nonatomic, strong) GAMBannerView *adMobBanner;
-@property (nonatomic, strong) BDMBannerRequest *bannerRequest;
+@property (nonatomic, strong) BidMachineBanner *bidmachineBanner;
+@property (nonatomic, strong) GAMBannerView *googleBanner;
 
 @property (weak,   nonatomic) IBOutlet UIView *container;
 
@@ -22,15 +21,23 @@
 
 - (void)loadAd:(id)sender {
     [self switchState:BSStateLoading];
-    self.bannerRequest = [BDMBannerRequest new];
-//    self.bannerRequest.adSize = BDMBannerAdSize320x50;
-//    self.bannerRequest.adSize = BDMBannerAdSize300x250;
-    [self.bannerRequest performWithDelegate:self];
+    
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared banner:nil :^(BidMachineBanner *banner, NSError *error) {
+        if (error) {
+            [weakSelf switchState: BSStateIdle];
+            return;
+        }
+        weakSelf.bidmachineBanner = banner;
+        weakSelf.bidmachineBanner.controller = weakSelf;
+        weakSelf.bidmachineBanner.delegate = weakSelf;
+        [weakSelf.bidmachineBanner loadAd];
+    }];
 }
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-    [self addBanner:self.banner inContainer:self.container];
+    [self addBanner:self.bidmachineBanner inContainer:self.container];
 }
 
 - (void)addBanner:(UIView *)banner inContainer:(UIView *)container {
@@ -47,38 +54,60 @@
           ]];
 }
 
-#pragma mark - BDMRequestDelegate
+#pragma mark - BidMachineAdDelegate
 
-- (void)request:(BDMRequest *)request completeWithInfo:(BDMAuctionInfo *)info {
-    GAMRequest *adMobRequest = [GAMRequest request];
-    adMobRequest.customTargeting = request.info.customParams;
+- (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    GAMRequest *googleRequest = [GAMRequest request];
+    googleRequest.customTargeting = @{
+        @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
+    };
     
-    self.adMobBanner = [[GAMBannerView alloc] initWithAdSize:GADAdSizeBanner];
-    self.adMobBanner.delegate = self;
-    self.adMobBanner.adUnitID = @UNIT_ID;
-    self.adMobBanner.rootViewController = [[UIApplication.sharedApplication keyWindow] rootViewController];
-    self.adMobBanner.appEventDelegate = self;
+    self.googleBanner = [[GAMBannerView alloc] initWithAdSize:GADAdSizeBanner];
+    self.googleBanner.delegate = self;
+    self.googleBanner.adUnitID = @UNIT_ID;
+    self.googleBanner.rootViewController = self;
+    self.googleBanner.appEventDelegate = self;
 
-    [self.adMobBanner loadRequest:adMobRequest];
+    [self.googleBanner loadRequest:googleRequest];
 }
 
-- (void)request:(BDMRequest *)request failedWithError:(NSError *)error {
+- (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     [self switchState:BSStateIdle];
 }
 
-- (void)requestDidExpire:(BDMRequest *)request {}
-
-#pragma mark - BDMBannerDelegate
-
-- (void)bannerViewReadyToPresent:(nonnull BDMBannerView *)bannerView {
-    [self switchState:BSStateReady];
+- (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
 }
 
-- (void)bannerView:(nonnull BDMBannerView *)bannerView failedWithError:(nonnull NSError *)error {
-    [self switchState:BSStateIdle];
+- (void)didDismissScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
 }
 
-- (void)bannerViewRecieveUserInteraction:(nonnull BDMBannerView *)bannerView {
+- (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
+    
+}
+
+- (void)didPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackImpression:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didUserInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)willPresentScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
@@ -98,9 +127,7 @@
 
 - (void)adView:(nonnull GADBannerView *)banner didReceiveAppEvent:(nonnull NSString *)name withInfo:(nullable NSString *)info {
     if ([name isEqualToString:@"bidmachine-banner"]) {
-        self.banner = [BDMBannerView new];
-        self.banner.delegate = self;
-        [self.banner populateWithRequest:self.bannerRequest];
+        [self switchState:BSStateReady];
     } else {
         [self switchState:BSStateIdle];
     }

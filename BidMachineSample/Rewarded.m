@@ -8,11 +8,10 @@
 
 #define UNIT_ID         "/91759738/bm_rewarded"
 
-@interface Rewarded ()<BDMRewardedDelegate, BDMRequestDelegate, GADAdMetadataDelegate>
+@interface Rewarded ()<BidMachineAdDelegate, GADAdMetadataDelegate>
 
-@property (nonatomic, strong) BDMRewarded *rewarded;
-@property (nonatomic, strong) GADRewardedAd *adMobRewarded;
-@property (nonatomic, strong) BDMRewardedRequest *rewardedRequest;
+@property (nonatomic, strong) BidMachineRewarded *bidMachineRewarded;
+@property (nonatomic, strong) GADRewardedAd *googleRewarded;
 
 @end
 
@@ -21,79 +20,93 @@
 - (void)loadAd:(id)sender {
     [self switchState:BSStateLoading];
     
-    self.rewardedRequest = [BDMRewardedRequest new];
-    [self.rewardedRequest performWithDelegate:self];
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared rewarded:nil :^(BidMachineRewarded *rewarded, NSError *error) {
+        if (error) {
+            [weakSelf switchState: BSStateIdle];
+            return;
+        }
+        weakSelf.bidMachineRewarded = rewarded;
+        weakSelf.bidMachineRewarded.controller = weakSelf;
+        weakSelf.bidMachineRewarded.delegate = weakSelf;
+        [weakSelf.bidMachineRewarded loadAd];
+    }];
 }
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-    [self.rewarded presentFromRootViewController:self];
+    [self.bidMachineRewarded presentAd];
 }
 
-#pragma mark - BDMRequestDelegate
+#pragma mark - BidMachineAdDelegate
 
-- (void)request:(BDMRequest *)request completeWithInfo:(BDMAuctionInfo *)info {
-    __weak __typeof__(self) weakSelf = self;
+- (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    GAMRequest *googleRequest = [GAMRequest request];
+    googleRequest.customTargeting = @{
+        @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
+    };
     
-    GAMRequest *adMobRequest = [GAMRequest request];
-    adMobRequest.customTargeting = request.info.customParams;
-    
+    __weak typeof(self) weakSelf = self;
     [GADRewardedAd loadWithAdUnitID:@UNIT_ID
-                            request:adMobRequest
+                            request:googleRequest
                   completionHandler:^(GADRewardedAd * _Nullable rewardedAd,
                                       NSError * _Nullable error) {
         if (error) {
             [weakSelf switchState:BSStateIdle];
         } else {
-            weakSelf.adMobRewarded = rewardedAd;
-            weakSelf.adMobRewarded.adMetadataDelegate = weakSelf;
+            weakSelf.googleRewarded = rewardedAd;
+            weakSelf.googleRewarded.adMetadataDelegate = weakSelf;
         }
     }];
 }
 
-- (void)request:(BDMRequest *)request failedWithError:(NSError *)error {
+- (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     [self switchState:BSStateIdle];
 }
 
-- (void)requestDidExpire:(BDMRequest *)request {}
-
-#pragma mark - BDMRewardedDelegate
-
-- (void)rewardedReadyToPresent:(nonnull BDMRewarded *)rewarded {
-    [self switchState:BSStateReady];
-}
-
-- (void)rewarded:(nonnull BDMRewarded *)rewarded failedWithError:(nonnull NSError *)error {
-    [self switchState:BSStateIdle];
-}
-
-- (void)rewarded:(nonnull BDMRewarded *)rewarded failedToPresentWithError:(nonnull NSError *)error {
+- (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
-- (void)rewardedWillPresent:(nonnull BDMRewarded *)rewarded {
+- (void)didDismissScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
-- (void)rewardedDidDismiss:(nonnull BDMRewarded *)rewarded {
+- (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
-- (void)rewardedRecieveUserInteraction:(nonnull BDMRewarded *)rewarded {
+- (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     
 }
 
-- (void)rewardedFinishRewardAction:(nonnull BDMRewarded *)rewarded {
+- (void)didPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
+
+- (void)didTrackImpression:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didUserInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)willPresentScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+#pragma mark - GADAdMetadataDelegate
 
 - (void)adMetadataDidChange:(nonnull id<GADAdMetadataProvider>)ad {
     if (![ad.adMetadata[@"AdTitle"] isEqual:@"bidmachine-rewarded"]) {
         [self switchState:BSStateIdle];
     } else {
-        self.rewarded = [BDMRewarded new];
-        self.rewarded.delegate = self;
-        [self.rewarded populateWithRequest:self.rewardedRequest];
+        [self switchState:BSStateReady];
     }
 }
 

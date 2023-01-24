@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1580BFCE0023BECE0FD83575 /* libPods-BidMachineSample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C8F25B5DC4F4DE34EC00031 /* libPods-BidMachineSample.a */; };
 		374B363A25E68462005F1499 /* Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374B363925E68462005F1499 /* Empty.swift */; };
 		659EB60723DB2710004F4550 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 659EB60623DB2710004F4550 /* AppDelegate.m */; };
 		659EB61023DB2710004F4550 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 659EB60E23DB2710004F4550 /* Main.storyboard */; };
@@ -18,14 +19,12 @@
 		659EB66323DB2B2F004F4550 /* Rewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 659EB65D23DB2B2E004F4550 /* Rewarded.m */; };
 		659EB66423DB2B2F004F4550 /* Interstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = 659EB65E23DB2B2E004F4550 /* Interstitial.m */; };
 		659EB66523DB2B2F004F4550 /* Banner.m in Sources */ = {isa = PBXBuildFile; fileRef = 659EB65F23DB2B2F004F4550 /* Banner.m */; };
-		ED245850F1584EB0C3FCD866 /* libPods-BidMachineSample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE2C9432FC7EF31129971C33 /* libPods-BidMachineSample.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1767644863B090BF2B00FC37 /* Pods-BidMachineSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BidMachineSample.debug.xcconfig"; path = "Target Support Files/Pods-BidMachineSample/Pods-BidMachineSample.debug.xcconfig"; sourceTree = "<group>"; };
-		374B363825E68461005F1499 /* BidMachineSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BidMachineSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		374B363925E68462005F1499 /* Empty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Empty.swift; sourceTree = "<group>"; };
-		51B9F7A7913339C875BA535F /* Pods-BidMachineSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BidMachineSample.release.xcconfig"; path = "Target Support Files/Pods-BidMachineSample/Pods-BidMachineSample.release.xcconfig"; sourceTree = "<group>"; };
+		54839CAC0CC360E36A360B27 /* Pods-BidMachineSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BidMachineSample.release.xcconfig"; path = "Target Support Files/Pods-BidMachineSample/Pods-BidMachineSample.release.xcconfig"; sourceTree = "<group>"; };
+		5C8F25B5DC4F4DE34EC00031 /* libPods-BidMachineSample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BidMachineSample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		659EB60523DB2710004F4550 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		659EB60623DB2710004F4550 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		659EB60F23DB2710004F4550 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -42,7 +41,8 @@
 		659EB65E23DB2B2E004F4550 /* Interstitial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Interstitial.m; sourceTree = "<group>"; };
 		659EB65F23DB2B2F004F4550 /* Banner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Banner.m; sourceTree = "<group>"; };
 		659EB66223DB2B2F004F4550 /* Banner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Banner.h; sourceTree = "<group>"; };
-		AE2C9432FC7EF31129971C33 /* libPods-BidMachineSample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BidMachineSample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65C52A492980051800261B34 /* BidMachineSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BidMachineSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		836B00D5D4EE8A54298BE6CD /* Pods-BidMachineSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BidMachineSample.debug.xcconfig"; path = "Target Support Files/Pods-BidMachineSample/Pods-BidMachineSample.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,26 +50,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED245850F1584EB0C3FCD866 /* libPods-BidMachineSample.a in Frameworks */,
+				1580BFCE0023BECE0FD83575 /* libPods-BidMachineSample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3E0E25F59BD2D8B05D374FDD /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				AE2C9432FC7EF31129971C33 /* libPods-BidMachineSample.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		557BF368B5174F4DD037E36D /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1767644863B090BF2B00FC37 /* Pods-BidMachineSample.debug.xcconfig */,
-				51B9F7A7913339C875BA535F /* Pods-BidMachineSample.release.xcconfig */,
+				836B00D5D4EE8A54298BE6CD /* Pods-BidMachineSample.debug.xcconfig */,
+				54839CAC0CC360E36A360B27 /* Pods-BidMachineSample.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -77,10 +69,10 @@
 		659EB5F923DB2710004F4550 = {
 			isa = PBXGroup;
 			children = (
+				65C52A492980051800261B34 /* BidMachineSample.app */,
 				659EB60423DB2710004F4550 /* BidMachineSample */,
-				374B363825E68461005F1499 /* BidMachineSample.app */,
 				557BF368B5174F4DD037E36D /* Pods */,
-				3E0E25F59BD2D8B05D374FDD /* Frameworks */,
+				709C1B0CF3898721FFC16788 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -132,6 +124,14 @@
 			name = Base;
 			sourceTree = "<group>";
 		};
+		709C1B0CF3898721FFC16788 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5C8F25B5DC4F4DE34EC00031 /* libPods-BidMachineSample.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -139,7 +139,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 659EB61B23DB2713004F4550 /* Build configuration list for PBXNativeTarget "BidMachineSample" */;
 			buildPhases = (
-				EF9F37FB497C713F2B304BF7 /* [CP] Check Pods Manifest.lock */,
+				EE28441CF64D50F0D0812F72 /* [CP] Check Pods Manifest.lock */,
 				659EB5FE23DB2710004F4550 /* Sources */,
 				659EB5FF23DB2710004F4550 /* Frameworks */,
 				659EB60023DB2710004F4550 /* Resources */,
@@ -150,7 +150,7 @@
 			);
 			name = BidMachineSample;
 			productName = BMHBIntegrationSample;
-			productReference = 374B363825E68461005F1499 /* BidMachineSample.app */;
+			productReference = 65C52A492980051800261B34 /* BidMachineSample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -201,7 +201,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		EF9F37FB497C713F2B304BF7 /* [CP] Check Pods Manifest.lock */ = {
+		EE28441CF64D50F0D0812F72 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -312,7 +312,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -364,7 +364,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -374,14 +374,14 @@
 		};
 		659EB61C23DB2713004F4550 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1767644863B090BF2B00FC37 /* Pods-BidMachineSample.debug.xcconfig */;
+			baseConfigurationReference = 836B00D5D4EE8A54298BE6CD /* Pods-BidMachineSample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WG4VFF78ZM;
 				INFOPLIST_FILE = BidMachineSample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -396,14 +396,14 @@
 		};
 		659EB61D23DB2713004F4550 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 51B9F7A7913339C875BA535F /* Pods-BidMachineSample.release.xcconfig */;
+			baseConfigurationReference = 54839CAC0CC360E36A360B27 /* Pods-BidMachineSample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WG4VFF78ZM;
 				INFOPLIST_FILE = BidMachineSample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

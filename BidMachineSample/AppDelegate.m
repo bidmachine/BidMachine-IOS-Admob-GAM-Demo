@@ -6,28 +6,26 @@
 
 #import "AppDelegate.h"
 
-#define APP_ID         "YOUR_APP_ID"
+#define APP_ID  "YOUR_APP_ID"
 
 
 @implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-     [self startBidMachine:^{
-         
-     }];
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[ GADSimulatorID ];
+    
+    [BidMachineSdk.shared populate:^(id<BidMachineInfoBuilderProtocol> builder) {
+        [builder withTestMode:YES];
+    }];
+    
+    [BidMachineSdk.shared.targetingInfo populate:^(id<BidMachineTargetingInfoBuilderProtocol> builder) {
+        [builder withStoreId:@"12345"];
+    }];
+    
+    [BidMachineSdk.shared initializeSdk:@"5"];
     
     return YES;
-}
-
-- (void)startBidMachine:(void(^)(void))completion {
-    BDMSdkConfiguration *config = [BDMSdkConfiguration new];
-    config.targeting = BDMTargeting.new;
-    config.targeting.storeId = @"12345";
-    config.testMode = YES;
-    [BDMSdk.sharedSdk startSessionWithSellerID:@"5"
-                                 configuration:config
-                                    completion:completion];
 }
 
 @end

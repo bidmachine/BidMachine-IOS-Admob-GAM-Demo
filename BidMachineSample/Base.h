@@ -27,4 +27,10 @@ typedef NS_ENUM(NSInteger, BSState) {
 
 @end
 
+@interface Base (Rounding)
+
+- (NSNumberFormatter *)formatter;
+
+@end
+
 NS_ASSUME_NONNULL_END

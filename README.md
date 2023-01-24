@@ -14,11 +14,11 @@
 
 ```ruby
 
-$BDMVersion = '~> 1.8.0.0'
-$GAMVersion = '~> 8.13.0'
+$BDMVersion = '~> 2.0.0.0'
+$GAMVersion = '~> 9.14.0'
 
 def bidmachine
-  pod 'BDMIABAdapter', $BDMVersion
+  pod 'BidMachine', $BDMVersion
 end
 
 def google
@@ -38,59 +38,79 @@ end
 
 ```objc
 
-    BDMSdkConfiguration *config = [BDMSdkConfiguration new];
-    config.testMode = YES;
-
-    config.targeting = BDMTargeting.new;
-    config.targeting.storeURL = [NSURL URLWithString:@"https://storeUrl"];
-    config.targeting.storeId = @"12345";
-
-    [BDMSdk.sharedSdk startSessionWithSellerID:@"5"
-                                 configuration:config
-                                    completion:nil];
+   [BidMachineSdk.shared populate:^(id<BidMachineInfoBuilderProtocol> builder) {
+        [builder withTestMode:YES];
+    }];
+    
+    [BidMachineSdk.shared.targetingInfo populate:^(id<BidMachineTargetingInfoBuilderProtocol> builder) {
+        [builder withStoreId:@"12345"];
+    }];
+    
+    [BidMachineSdk.shared initializeSdk:@"5"];
 ```
 
 
 ### Banner implementation
 
-First you need to load ad request from BidMachine
+First you need to load ad from BidMachine
 
-> **NOTE:_** MREC load requires a different size 
+> **NOTE:_** [MREC load requires a different size](https://docs.bidmachine.io/docs/ad-request#create-request-configuration)
 
 ```objc
 
-self.bannerRequest = [BDMBannerRequest new];
-//    self.bannerRequest.adSize = BDMBannerAdSize320x50;
-//    self.bannerRequest.adSize = BDMBannerAdSize300x250;
-[self.bannerRequest performWithDelegate:self];
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared banner:nil :^(BidMachineBanner *banner, NSError *error) {
+        if (error) {
+            return;
+        }
+        weakSelf.bidmachineBanner = banner;
+        weakSelf.bidmachineBanner.controller = weakSelf;
+        weakSelf.bidmachineBanner.delegate = weakSelf;
+        [weakSelf.bidmachineBanner loadAd];
+    }];
 
 ```
 
-After loading the request, you need to load GAM ad with BidMachine request parameters.
+After loading the ad, you need to load GAM ad with BidMachine ad parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
+> **_WARNING:_** GAM request params should contains price with x.xx format
 
 
 ```objc
 
-#pragma mark - BDMRequestDelegate
+- (NSNumberFormatter *)formatter {
+    static NSNumberFormatter *roundingFormater = nil;
+    if (!roundingFormater) {
+        roundingFormater = [NSNumberFormatter new];
+        roundingFormater.numberStyle = NSNumberFormatterDecimalStyle;
+        roundingFormater.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        roundingFormater.roundingMode = NSNumberFormatterRoundCeiling;
+        roundingFormater.positiveFormat = @"0.00";
+    }
+    return roundingFormater;
+}
 
-- (void)request:(BDMRequest *)request completeWithInfo:(BDMAuctionInfo *)info {
-    GAMRequest *adMobRequest = [GAMRequest request];
-    adMobRequest.customTargeting = request.info.customParams;
+#pragma mark - BidMachineAdDelegate
+
+- (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    GAMRequest *googleRequest = [GAMRequest request];
+    googleRequest.customTargeting = @{
+        @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
+    };
     
-    self.adMobBanner = [[GAMBannerView alloc] initWithAdSize:GADAdSizeBanner];
-    self.adMobBanner.delegate = self;
-    self.adMobBanner.adUnitID = @UNIT_ID;
-    self.adMobBanner.rootViewController = [[UIApplication.sharedApplication keyWindow] rootViewController];
-    self.adMobBanner.appEventDelegate = self;
+    self.googleBanner = [[GAMBannerView alloc] initWithAdSize:GADAdSizeBanner];
+    self.googleBanner.delegate = self;
+    self.googleBanner.adUnitID = @UNIT_ID;
+    self.googleBanner.rootViewController = self;
+    self.googleBanner.appEventDelegate = self;
 
-    [self.adMobBanner loadRequest:adMobRequest];
+    [self.googleBanner loadRequest:googleRequest];
 }
 
 ```
 
 If the GAM Ad loads successfully, you need to listen events delegate. 
-If the event name matches the registered event for BidMachine, then you need to load the ad via BidMachine. If it does not match, then show through GAM
+If the event name matches the registered event for BidMachine, then you need to present the ad via BidMachine. If it does not match, then show through GAM
 
 ```objc
 
@@ -104,9 +124,7 @@ If the event name matches the registered event for BidMachine, then you need to 
 
 - (void)adView:(nonnull GADBannerView *)banner didReceiveAppEvent:(nonnull NSString *)name withInfo:(nullable NSString *)info {
     if ([name isEqualToString:@"bidmachine-banner"]) {
-        self.banner = [BDMBannerView new];
-        self.banner.delegate = self;
-        [self.banner populateWithRequest:self.bannerRequest];
+        // SHOW BidMachine
     } else {
         // SHOW GADBannerView
     }
@@ -114,54 +132,63 @@ If the event name matches the registered event for BidMachine, then you need to 
 
 ```
 
-For example:
-
-```objc
-
-#pragma mark - BDMBannerDelegate
-
-- (void)bannerViewReadyToPresent:(nonnull BDMBannerView *)bannerView {
-    [bannerView removeFromSuperview];
-    [self.view addSubview: bannerView];
-}
-
-```
-
 ### Interstitial implementation
 
-First you need to load ad request from BidMachine
+First you need to load ad from BidMachine
 
 ```objc
 
-self.interstitialRequest = [BDMInterstitialRequest new];
-[self.interstitialRequest performWithDelegate:self];
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared interstitial:nil :^(BidMachineInterstitial *interstitial, NSError *error) {
+        if (error) {
+            return;
+        }
+        weakSelf.bidmachineInterstitial = interstitial;
+        weakSelf.bidmachineInterstitial.controller = weakSelf;
+        weakSelf.bidmachineInterstitial.delegate = weakSelf;
+        [weakSelf.bidmachineInterstitial loadAd];
+    }];
 
 ```
 
-After loading the request, you need to load GAM with BidMachine request parameters.
+After loading the ad, you need to load GAM with BidMachine ad parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
+> **_WARNING:_** GAM request params should contains price with x.xx format
 
 
 ```objc
 
-#pragma mark - BDMRequestDelegate
+- (NSNumberFormatter *)formatter {
+    static NSNumberFormatter *roundingFormater = nil;
+    if (!roundingFormater) {
+        roundingFormater = [NSNumberFormatter new];
+        roundingFormater.numberStyle = NSNumberFormatterDecimalStyle;
+        roundingFormater.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        roundingFormater.roundingMode = NSNumberFormatterRoundCeiling;
+        roundingFormater.positiveFormat = @"0.00";
+    }
+    return roundingFormater;
+}
 
-- (void)request:(BDMRequest *)request completeWithInfo:(BDMAuctionInfo *)info {
-    __weak __typeof__(self) weakSelf = self;
+#pragma mark - BidMachineAdDelegate
+
+- (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    GAMRequest *googleRequest = [GAMRequest request];
+    googleRequest.customTargeting = @{
+        @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
+    };
     
-    GAMRequest *adMobRequest = [GAMRequest request];
-    adMobRequest.customTargeting = request.info.customParams;
-    
+    __weak typeof(self) weakSelf = self;
     [GAMInterstitialAd loadWithAdManagerAdUnitID:@UNIT_ID
-                                         request:adMobRequest
+                                         request:googleRequest
                                completionHandler:^(GAMInterstitialAd * _Nullable interstitialAd,
                                                    NSError * _Nullable error) {
         if (error) {
             // FAIL LOAD
         } else {
             // WAIT AD EVENT DELEGATE
-            weakSelf.adMobInterstitial = interstitialAd;
-            weakSelf.adMobInterstitial.appEventDelegate = weakSelf;
+            weakSelf.googleInterstitial = interstitialAd;
+            weakSelf.googleInterstitial.appEventDelegate = weakSelf;
         }
     }];
 }
@@ -169,7 +196,7 @@ After loading the request, you need to load GAM with BidMachine request paramete
 ```
 
 If the GAM Ad loads successfully, you need to listen events delegate. 
-If the event name matches the registered event for BidMachine, then you need to load the ad via BidMachine. If it does not match, then show through GAM
+If the event name matches the registered event for BidMachine, then you need to show the ad via BidMachine. If it does not match, then show through GAM
 
 ```objc
 
@@ -180,9 +207,7 @@ If the event name matches the registered event for BidMachine, then you need to 
               withInfo:(nullable NSString *)info {
     
     if ([name isEqualToString:@"bidmachine-interstitial"]) {
-        self.interstitial = [BDMInterstitial new];
-        self.interstitial.delegate = self;
-        [self.interstitial populateWithRequest:self.interstitialRequest];
+         // SHOW BidMachine
     } else {
         // SHOW GADInterstitialAd
     }
@@ -190,34 +215,67 @@ If the event name matches the registered event for BidMachine, then you need to 
 
 ```
 
-For example:
-
-```objc
-
-#pragma mark - BDMInterstitialDelegate
-
-- (void)interstitialReadyToPresent:(nonnull BDMInterstitial *)interstitial {
-    [interstitial presentFromRootViewController:self];
-}
-
-```
-
 ### Rewarded implementation
 
-First you need to load ad request from BidMachine
+First you need to load ad from BidMachine
 
 ```objc
 
-self.rewardedRequest = [BDMRewardedRequest new];
-[self.rewardedRequest performWithDelegate:self];
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared rewarded:nil :^(BidMachineRewarded *rewarded, NSError *error) {
+        if (error) {
+            return;
+        }
+        weakSelf.bidMachineRewarded = rewarded;
+        weakSelf.bidMachineRewarded.controller = weakSelf;
+        weakSelf.bidMachineRewarded.delegate = weakSelf;
+        [weakSelf.bidMachineRewarded loadAd];
+    }];
 
 ```
 
 After loading the request, you need to load GAM ad with BidMachine request parameters.
 > **_WARNING:_** Don't forget to install appEventDelegate
+> **_WARNING:_** GAM request params should contains price with x.xx format
 
 
 ```objc
+
+- (NSNumberFormatter *)formatter {
+    static NSNumberFormatter *roundingFormater = nil;
+    if (!roundingFormater) {
+        roundingFormater = [NSNumberFormatter new];
+        roundingFormater.numberStyle = NSNumberFormatterDecimalStyle;
+        roundingFormater.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        roundingFormater.roundingMode = NSNumberFormatterRoundCeiling;
+        roundingFormater.positiveFormat = @"0.00";
+    }
+    return roundingFormater;
+}
+
+
+#pragma mark - BidMachineAdDelegate
+
+- (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    GAMRequest *googleRequest = [GAMRequest request];
+    googleRequest.customTargeting = @{
+        @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
+    };
+    
+    __weak typeof(self) weakSelf = self;
+    [GADRewardedAd loadWithAdUnitID:@UNIT_ID
+                            request:googleRequest
+                  completionHandler:^(GADRewardedAd * _Nullable rewardedAd,
+                                      NSError * _Nullable error) {
+        if (error) {
+             // FAIL LOAD
+        } else {
+            // WAIT AD EVENT DELEGATE
+            weakSelf.googleRewarded = rewardedAd;
+            weakSelf.googleRewarded.adMetadataDelegate = weakSelf;
+        }
+    }];
+}
 
 #pragma mark - BDMRequestDelegate
 
@@ -244,7 +302,7 @@ After loading the request, you need to load GAM ad with BidMachine request param
 ```
 
 If the GAM Ad loads successfully, you need to listen events delegate. 
-If the event name matches the registered event for BidMachine, then you need to load the ad via BidMachine. If it does not match, then show through GAM
+If the event name matches the registered event for BidMachine, then you need to show the ad via BidMachine. If it does not match, then show through GAM
 
 ```objc
 
@@ -252,22 +310,8 @@ If the event name matches the registered event for BidMachine, then you need to 
     if (![ad.adMetadata[@"AdTitle"] isEqual:@"bidmachine-rewarded"]) {
         // SHOW GADRewardedAd
     } else {
-        self.rewarded = [BDMRewarded new];
-        self.rewarded.delegate = self;
-        [self.rewarded populateWithRequest:self.rewardedRequest];
+        // SHOW BidMachine
     }
-}
-
-```
-
-For example:
-
-```objc
-
-#pragma mark - BDMRewardedDelegate
-
-- (void)rewardedReadyToPresent:(nonnull BDMRewarded *)rewarded {
-    [rewarded presentFromRootViewController:self];
 }
 
 ```

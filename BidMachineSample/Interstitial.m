@@ -8,11 +8,10 @@
 
 #define UNIT_ID         "/91759738/bm_interstitial"
 
-@interface Interstitial ()<BDMInterstitialDelegate, BDMRequestDelegate, GADAppEventDelegate>
+@interface Interstitial ()<BidMachineAdDelegate, GADAppEventDelegate>
 
-@property (nonatomic, strong) BDMInterstitial *interstitial;
-@property (nonatomic, strong) GAMInterstitialAd *adMobInterstitial;
-@property (nonatomic, strong) BDMInterstitialRequest *interstitialRequest;
+@property (nonatomic, strong) BidMachineInterstitial *bidmachineInterstitial;
+@property (nonatomic, strong) GAMInterstitialAd *googleInterstitial;
 
 @end
 
@@ -21,65 +20,83 @@
 - (void)loadAd:(id)sender {
     [self switchState:BSStateLoading];
     
-    self.interstitialRequest = [BDMInterstitialRequest new];
-    [self.interstitialRequest performWithDelegate:self];
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared interstitial:nil :^(BidMachineInterstitial *interstitial, NSError *error) {
+        if (error) {
+            [weakSelf switchState: BSStateIdle];
+            return;
+        }
+        weakSelf.bidmachineInterstitial = interstitial;
+        weakSelf.bidmachineInterstitial.controller = weakSelf;
+        weakSelf.bidmachineInterstitial.delegate = weakSelf;
+        [weakSelf.bidmachineInterstitial loadAd];
+    }];
 }
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-    [self.interstitial presentFromRootViewController:self];
+    [self.bidmachineInterstitial presentAd];
 }
 
-#pragma mark - BDMRequestDelegate
+#pragma mark - BidMachineAdDelegate
 
-- (void)request:(BDMRequest *)request completeWithInfo:(BDMAuctionInfo *)info {
-    __weak __typeof__(self) weakSelf = self;
+- (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    GAMRequest *googleRequest = [GAMRequest request];
+    googleRequest.customTargeting = @{
+        @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
+    };
     
-    GAMRequest *adMobRequest = [GAMRequest request];
-    adMobRequest.customTargeting = request.info.customParams;
-    
+    __weak typeof(self) weakSelf = self;
     [GAMInterstitialAd loadWithAdManagerAdUnitID:@UNIT_ID
-                                         request:adMobRequest
+                                         request:googleRequest
                                completionHandler:^(GAMInterstitialAd * _Nullable interstitialAd,
                                                    NSError * _Nullable error) {
         if (error) {
             [weakSelf switchState: BSStateIdle];
         } else {
-            weakSelf.adMobInterstitial = interstitialAd;
-            weakSelf.adMobInterstitial.appEventDelegate = weakSelf;
+            weakSelf.googleInterstitial = interstitialAd;
+            weakSelf.googleInterstitial.appEventDelegate = weakSelf;
         }
     }];
 }
 
-- (void)request:(BDMRequest *)request failedWithError:(NSError *)error {
-    [self switchState: BSStateIdle];
-}
-
-- (void)requestDidExpire:(BDMRequest *)request {}
-
-#pragma mark - BDMInterstitialDelegate
-
-- (void)interstitialReadyToPresent:(nonnull BDMInterstitial *)interstitial {
-    [self switchState:BSStateReady];
-}
-
-- (void)interstitial:(nonnull BDMInterstitial *)interstitial failedWithError:(nonnull NSError *)error {
+- (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     [self switchState:BSStateIdle];
 }
 
-- (void)interstitial:(nonnull BDMInterstitial *)interstitial failedToPresentWithError:(nonnull NSError *)error {
+- (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
-- (void)interstitialWillPresent:(nonnull BDMInterstitial *)interstitial {
+- (void)didDismissScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
-- (void)interstitialDidDismiss:(nonnull BDMInterstitial *)interstitial {
+- (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
-- (void)interstitialRecieveUserInteraction:(nonnull BDMInterstitial *)interstitial {
+- (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
+    
+}
+
+- (void)didPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackImpression:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didUserInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)willPresentScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
@@ -90,9 +107,7 @@
               withInfo:(nullable NSString *)info {
     
     if ([name isEqualToString:@"bidmachine-interstitial"]) {
-        self.interstitial = [BDMInterstitial new];
-        self.interstitial.delegate = self;
-        [self.interstitial populateWithRequest:self.interstitialRequest];
+        [self switchState:BSStateReady];
     } else {
         [self switchState:BSStateIdle];
     }
