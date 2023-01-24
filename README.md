@@ -280,28 +280,6 @@ After loading the request, you need to load GAM ad with BidMachine request param
     }];
 }
 
-#pragma mark - BDMRequestDelegate
-
-- (void)request:(BDMRequest *)request completeWithInfo:(BDMAuctionInfo *)info {
-    __weak __typeof__(self) weakSelf = self;
-    
-    GAMRequest *adMobRequest = [GAMRequest request];
-    adMobRequest.customTargeting = request.info.customParams;
-    
-    [GADRewardedAd loadWithAdUnitID:@UNIT_ID
-                            request:adMobRequest
-                  completionHandler:^(GADRewardedAd * _Nullable rewardedAd,
-                                      NSError * _Nullable error) {
-        if (error) {
-            // FAIL LOAD
-        } else {
-            // WAIT AD EVENT DELEGATE
-            weakSelf.adMobRewarded = rewardedAd;
-            weakSelf.adMobRewarded.adMetadataDelegate = weakSelf;
-        }
-    }];
-}
-
 ```
 
 If the GAM Ad loads successfully, you need to listen events delegate. 
