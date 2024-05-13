@@ -5,8 +5,8 @@ source 'https://cdn.cocoapods.org/'
 
 install! 'cocoapods', :deterministic_uuids => false, :warn_for_multiple_pod_sources => false
 
-$BDMVersion = '~> 2.0.0.0'
-$GAMVersion = '~> 9.14.0'
+$BDMVersion = '~> 2.7.0'
+$GAMVersion = '~> 11.4.0'
 
 def bidmachine
   pod 'BidMachine', $BDMVersion
