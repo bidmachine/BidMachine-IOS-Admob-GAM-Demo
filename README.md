@@ -14,8 +14,8 @@
 
 ```ruby
 
-$BDMVersion = '~> 2.0.0.0'
-$GAMVersion = '~> 9.14.0'
+$BDMVersion = '~> 2.7.0'
+$GAMVersion = '~> 11.4.0'
 
 def bidmachine
   pod 'BidMachine', $BDMVersion
