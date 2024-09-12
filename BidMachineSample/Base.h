@@ -5,6 +5,7 @@
 //
 
 #import "AppDelegate.h"
+#import "BidMachineSample-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
