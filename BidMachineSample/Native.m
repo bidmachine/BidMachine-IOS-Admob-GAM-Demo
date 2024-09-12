@@ -44,11 +44,18 @@
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-
-    NativeAdView *adView = [NativeAdView new];
-    NSError *error;
     
-    [self.bidMachineNativeAd presentAd:self.adContainer :adView error:&error];
+    if (self.bidMachineNativeAd) {
+        NativeAdView *adView = [NativeAdView new];
+        NSError *error;
+        
+        [self.bidMachineNativeAd presentAd:self.adContainer :adView error:&error];
+    } else if (self.googleNativeAd) {
+        GADNativeAdView* googleView = [GADNativeAdView new];
+        googleView.nativeAd = self.googleNativeAd;
+        
+        #warning populate with data and layout in container?
+    }
 }
 
 #pragma mark - private
