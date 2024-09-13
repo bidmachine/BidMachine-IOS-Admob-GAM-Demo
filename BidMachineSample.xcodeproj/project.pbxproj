@@ -123,8 +123,8 @@
 				659EB65E23DB2B2E004F4550 /* Interstitial.m */,
 				659EB65C23DB2B2E004F4550 /* Rewarded.h */,
 				659EB65D23DB2B2E004F4550 /* Rewarded.m */,
-				01BBC2432C930A180053B392 /* Native.m */,
 				01BBC2452C930A260053B392 /* Native.h */,
+				01BBC2432C930A180053B392 /* Native.m */,
 				01387A1D2C934A5900EDB58F /* Subviews */,
 			);
 			name = AdControllers;

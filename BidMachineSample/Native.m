@@ -6,7 +6,7 @@
 
 #import "Native.h"
 
-#define UNIT_ID         "/91759738/bm_native"
+#define UNIT_ID         "22897248656/bidmachine_test/native"
 
 @interface Native ()<BidMachineAdDelegate, GADNativeAdLoaderDelegate>
 
@@ -19,23 +19,6 @@
 @end
 
 @implementation Native
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    self.adContainer = [UIView new];
-    self.adContainer.translatesAutoresizingMaskIntoConstraints = NO;
-    self.adContainer.backgroundColor = UIColor.redColor;
-    
-    [self.view addSubview:self.adContainer];
-    [NSLayoutConstraint activateConstraints:
-     @[
-         [self.adContainer.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-         [self.adContainer.heightAnchor constraintEqualToConstant:300],
-         [self.adContainer.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-         [self.adContainer.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-     ]];
-}
 
 - (void)loadAd:(id)sender {
     [self switchState:BSStateLoading];
@@ -56,6 +39,24 @@
         
         #warning populate with data and layout in container?
     }
+    NSLog(@"No ad to display");
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.adContainer = [UIView new];
+    self.adContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    self.adContainer.backgroundColor = UIColor.redColor;
+    
+    [self.view addSubview:self.adContainer];
+    [NSLayoutConstraint activateConstraints:
+     @[
+         [self.adContainer.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
+         [self.adContainer.heightAnchor constraintGreaterThanOrEqualToConstant:50],
+         [self.adContainer.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+         [self.adContainer.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+     ]];
 }
 
 #pragma mark - private
@@ -66,6 +67,7 @@
     [BidMachineSdk.shared native:nil :^(BidMachineNative *native, NSError *error) {
         if (error) {
             [weakSelf switchState: BSStateIdle];
+            NSLog(@"Native ad request finished with error %@",error.localizedDescription);
             return;
         }
         weakSelf.bidMachineNativeAd = native;
@@ -78,6 +80,7 @@
 - (void)loadAdManagerNativeWith:(id<BidMachineAdProtocol> _Nullable)ad {
     GAMRequest *googleRequest = [GAMRequest request];
     
+    #warning is only bm_pf required?
     if (ad) {
         googleRequest.customTargeting = @{
             @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
@@ -89,11 +92,10 @@
         initWithAdUnitID:@UNIT_ID
         rootViewController:nil
         adTypes:@[ GADAdLoaderAdTypeNative ]
-        options:@[]
+        options:nil
     ];
 
     self.adLoader.delegate = self;
-    
     [self.adLoader loadRequest:googleRequest];
 }
 
@@ -109,6 +111,10 @@
     #warning ask about winner and ecpm
     [BidMachineSdk.shared notifyMediationLoss:@"WINNER" ecpm:0.0 ad:self.bidMachineNativeAd];
     self.bidMachineNativeAd = nil;
+}
+
+- (BOOL)isBidMachineAd:(GADNativeAd *)nativeAd {
+    return [nativeAd.advertiser isEqualToString:@"bidmachine"];
 }
 
 #pragma mark - BidMachineAdDelegate
@@ -128,7 +134,7 @@
 }
 
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveNativeAd:(GADNativeAd *)nativeAd {
-    BOOL bidMachineWon = [nativeAd.advertiser isEqualToString:@"bidmachine"];
+    BOOL bidMachineWon = [self isBidMachineAd:nativeAd];
     
     if (bidMachineWon) {
         [self onBidMachineWin];
@@ -139,7 +145,6 @@
 }
 
 - (void)adLoaderDidFinishLoading:(GADAdLoader *)adLoader {
-    
 }
 
 @end
