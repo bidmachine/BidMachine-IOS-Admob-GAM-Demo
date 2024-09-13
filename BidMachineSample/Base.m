@@ -8,8 +8,8 @@
 
 @interface Base ()
 
-@property (weak, nonatomic) UIView *loadButton;
-@property (weak, nonatomic) UIView *showButton;
+@property (weak, nonatomic) UIButton *loadButton;
+@property (weak, nonatomic) UIButton *showButton;
 
 @end
 
@@ -47,16 +47,16 @@
 - (void)switchState:(BSState)state {
     switch (state) {
         case BSStateIdle: {
-            self.loadButton.hidden = NO;
-            self.showButton.hidden = YES;
+            self.loadButton.enabled = YES;
+            self.showButton.enabled = NO;
         } break;
         case BSStateLoading: {
-            self.loadButton.hidden = YES;
-            self.showButton.hidden = YES;
+            self.loadButton.enabled = NO;
+            self.showButton.enabled = NO;
         } break;
         case BSStateReady: {
-            self.loadButton.hidden = YES;
-            self.showButton.hidden = NO;
+            self.loadButton.enabled = NO;
+            self.showButton.enabled = YES;
         } break;
         default:
             break;

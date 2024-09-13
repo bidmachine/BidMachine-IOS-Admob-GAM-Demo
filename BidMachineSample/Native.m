@@ -6,7 +6,7 @@
 
 #import "Native.h"
 
-#define UNIT_ID         "22897248656/bidmachine_test/native"
+#define UNIT_ID         "/22897248656/bidmachine_test/native"
 
 @interface Native ()<BidMachineAdDelegate, GADNativeAdLoaderDelegate>
 
@@ -27,41 +27,78 @@
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-    
+
     if (self.bidMachineNativeAd) {
-        NativeAdView *adView = [NativeAdView new];
-        NSError *error;
-        
-        [self.bidMachineNativeAd presentAd:self.adContainer :adView error:&error];
+        [self layoutBidMachineNativeView];
     } else if (self.googleNativeAd) {
-        GADNativeAdView* googleView = [GADNativeAdView new];
-        googleView.nativeAd = self.googleNativeAd;
-        
-        #warning populate with data and layout in container?
+        [self layoutAdManagerNativeView];
+    } else {
+        NSLog(@"No ad to display");
     }
-    NSLog(@"No ad to display");
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    [self layoutAdContainer];
+}
+
+#pragma mark - private
+
+- (void)layoutAdContainer {
     self.adContainer = [UIView new];
     self.adContainer.translatesAutoresizingMaskIntoConstraints = NO;
-    self.adContainer.backgroundColor = UIColor.redColor;
+    self.adContainer.layer.borderColor = UIColor.grayColor.CGColor;
+    self.adContainer.layer.borderWidth = 1.0;
     
     [self.view addSubview:self.adContainer];
     [NSLayoutConstraint activateConstraints:
      @[
          [self.adContainer.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
-         [self.adContainer.heightAnchor constraintGreaterThanOrEqualToConstant:50],
-         [self.adContainer.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-         [self.adContainer.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+         [self.adContainer.heightAnchor constraintGreaterThanOrEqualToConstant:0],
+         [self.adContainer.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:10],
+         [self.adContainer.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-10],
      ]];
 }
 
-#pragma mark - private
+- (void)layoutBidMachineNativeView {
+    NativeAdView *adView = [NativeAdView new];
+    NSError *error;
+    self.bidMachineNativeAd.controller = self;
+    [self.bidMachineNativeAd presentAd:self.adContainer :adView error:&error];
+    
+    if (error) {
+        return;
+    }
+    
+    adView.translatesAutoresizingMaskIntoConstraints = false;
+    [self.adContainer addSubview:adView];
+    [NSLayoutConstraint activateConstraints:
+     @[
+        [adView.topAnchor constraintEqualToAnchor:self.adContainer.topAnchor],
+        [adView.bottomAnchor constraintEqualToAnchor:self.adContainer.bottomAnchor],
+        [adView.leadingAnchor constraintEqualToAnchor:self.adContainer.leadingAnchor],
+        [adView.trailingAnchor constraintEqualToAnchor:self.adContainer.trailingAnchor],
+    ]];
+}
+
+- (void)layoutAdManagerNativeView {
+    GADNativeAdView* googleView = [GADNativeAdView new];
+    googleView.nativeAd = self.googleNativeAd;
+    
+    #warning populate with data and layout in container?
+}
+
+- (void)resetNative {
+    self.bidMachineNativeAd = nil;
+    self.googleNativeAd = nil;
+    self.adLoader = nil;
+    [self.adContainer.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
+        [subview removeFromSuperview];
+    }];
+}
 
 - (void)loadNative {
+    [self resetNative];
     __weak typeof(self) weakSelf = self;
     
     [BidMachineSdk.shared native:nil :^(BidMachineNative *native, NSError *error) {
@@ -79,12 +116,10 @@
 
 - (void)loadAdManagerNativeWith:(id<BidMachineAdProtocol> _Nullable)ad {
     GAMRequest *googleRequest = [GAMRequest request];
-    
-    #warning is only bm_pf required?
+
+    NSString *price = @"1.00"; // [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
     if (ad) {
-        googleRequest.customTargeting = @{
-            @"bm_pf" : [self.formatter stringFromNumber:@(ad.auctionInfo.price)]
-        };
+        googleRequest.customTargeting = @{ @"bm_pf" : price };
     }
 
     self.adLoader = [
@@ -108,8 +143,8 @@
 }
 
 - (void)onBidMachineLoss {
-    #warning ask about winner and ecpm
-    [BidMachineSdk.shared notifyMediationLoss:@"WINNER" ecpm:0.0 ad:self.bidMachineNativeAd];
+    #warning android implementation has such method without parameters
+    [BidMachineSdk.shared notifyMediationLoss:@"unknown" ecpm:0.0 ad:self.bidMachineNativeAd];
     self.bidMachineNativeAd = nil;
 }
 
