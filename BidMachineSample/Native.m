@@ -7,6 +7,7 @@
 #import "Native.h"
 
 #define UNIT_ID         "your unit ID here"
+#define ADVERTISER      "bidmachine"
 
 @interface Native ()<BidMachineAdDelegate, GADNativeAdLoaderDelegate>
 
@@ -157,7 +158,7 @@
     if (!nativeAd.advertiser) {
         return NO;
     }
-    return [nativeAd.advertiser isEqualToString:@"bidmachine"];
+    return [nativeAd.advertiser isEqualToString:@ADVERTISER];
 }
 
 #pragma mark - BidMachineAdDelegate
