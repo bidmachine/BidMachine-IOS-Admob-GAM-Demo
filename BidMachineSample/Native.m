@@ -150,7 +150,7 @@
 }
 
 - (void)onBidMachineLoss {
-    [BidMachineSdk.shared notifyMediationLoss:@"unknown" ecpm:0.0 ad:self.bidMachineNativeAd];
+    [BidMachineSdk.shared notifyMediationLoss:@"" ecpm:0.0 ad:self.bidMachineNativeAd];
     self.bidMachineNativeAd = nil;
 }
 
