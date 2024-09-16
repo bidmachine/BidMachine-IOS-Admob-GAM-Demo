@@ -29,7 +29,11 @@
     [self switchState:BSStateIdle];
 
     if (self.bidMachineNativeAd) {
-        [self layoutBidMachineNativeView];
+        if (self.bidMachineNativeAd.canShow) {
+            [self layoutBidMachineNativeView];
+        } else {
+            NSLog(@"Bid Machine ad object can't be shown");
+        }
     } else if (self.googleNativeAd) {
         [self layoutAdManagerNativeView];
     } else {
@@ -82,14 +86,13 @@
 }
 
 - (void)layoutAdManagerNativeView {
-    /* Set up GADNativeAdView following the instructions at:
-       https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced */
-    
-    GADNativeAdView* googleView = [GADNativeAdView new];
-    googleView.nativeAd = self.googleNativeAd;
+    GADNativeAdView* googleAdView = [GADNativeAdView new];
+    googleAdView.nativeAd = self.googleNativeAd;
+
+    // Set up GADNativeAdView following the instructions at: https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced
 }
 
-- (void)resetNative {
+- (void)deleteLoadedAd {
     [self.bidMachineNativeAd unregisterView];
 
     self.bidMachineNativeAd = nil;
@@ -101,9 +104,9 @@
 }
 
 - (void)loadNative {
-    [self resetNative];
+    [self deleteLoadedAd];
+
     __weak typeof(self) weakSelf = self;
-    
     [BidMachineSdk.shared native:nil :^(BidMachineNative *native, NSError *error) {
         if (error) {
             [weakSelf switchState: BSStateIdle];
@@ -120,15 +123,15 @@
 - (void)loadAdManagerNativeWith:(id<BidMachineAdProtocol> _Nullable)ad {
     GAMRequest *googleRequest = [GAMRequest request];
 
-    NSString *price = [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
     if (ad) {
+        NSString *price = [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
         googleRequest.customTargeting = @{ @"bm_pf" : price };
     }
 
     self.adLoader = [
         [GADAdLoader alloc]
         initWithAdUnitID:@UNIT_ID
-        rootViewController:nil
+        rootViewController:self
         adTypes:@[ GADAdLoaderAdTypeNative ]
         options:nil
     ];
@@ -151,6 +154,9 @@
 }
 
 - (BOOL)isBidMachineAd:(GADNativeAd *)nativeAd {
+    if (!nativeAd.advertiser) {
+        return NO;
+    }
     return [nativeAd.advertiser isEqualToString:@"bidmachine"];
 }
 

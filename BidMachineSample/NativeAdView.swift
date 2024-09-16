@@ -12,12 +12,27 @@ public class NativeAdView: UIView {
     private let _titleLabel = UILabel()
     private let _descriptionLabel = UILabel()
     private let _callToActionLabel = UILabel()
+    
+    private lazy var callToActionView = {
+        let container = UIView()
+        container.backgroundColor = .lightGray
+        container.addSubview(_callToActionLabel)
+        container.layer.cornerRadius = 7.0
+        return container
+    }()
 
     private let _iconView = UIImageView()
 
     private let _mediaContainerView = UIView()
-    private let _adChoiceView = UIView()
-    
+    private let _adChoiceView = {
+        let label = UILabel()
+        label.text = "Ad"
+        label.font = .systemFont(ofSize: 15)
+        label.textColor = .gray
+        
+        return label
+    }()
+
     private lazy var topStack = {
         let stackView = UIStackView(
             arrangedSubviews: [
@@ -50,13 +65,11 @@ public class NativeAdView: UIView {
         let stackView = UIStackView(
             arrangedSubviews: [
                 topStack,
-                _mediaContainerView,
-                _adChoiceView
+                _mediaContainerView
             ]
         )
         stackView.axis = .vertical
         stackView.spacing = 3.0
-        stackView.alignment = .leading
         
         return stackView
     }()
@@ -77,17 +90,21 @@ public class NativeAdView: UIView {
 private extension NativeAdView {
     func setupSubviews() {
         addSubview(contentStack)
-        addSubview(_callToActionLabel)
+        addSubview(callToActionView)
+        addSubview(_adChoiceView)
 
         _titleLabel.font = .systemFont(ofSize: 19, weight: .bold)
         _descriptionLabel.font = .systemFont(ofSize: 16, weight: .medium)
-        _callToActionLabel.backgroundColor = .lightGray
+        
+        _callToActionLabel.textColor = .white
     }
 
     func setupConstraints() {
         contentStack.translatesAutoresizingMaskIntoConstraints = false
+        callToActionView.translatesAutoresizingMaskIntoConstraints = false
         _iconView.translatesAutoresizingMaskIntoConstraints = false
         _callToActionLabel.translatesAutoresizingMaskIntoConstraints = false
+        _adChoiceView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             contentStack.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -98,8 +115,16 @@ private extension NativeAdView {
             _iconView.widthAnchor.constraint(equalToConstant: UIConstant.iconSide),
             _iconView.heightAnchor.constraint(equalToConstant: UIConstant.iconSide),
             
-            _callToActionLabel.rightAnchor.constraint(equalTo: self.rightAnchor),
-            _callToActionLabel.bottomAnchor.constraint(equalTo: self.topStack.bottomAnchor),
+            _callToActionLabel.rightAnchor.constraint(equalTo: self.callToActionView.rightAnchor, constant: -7.0),
+            _callToActionLabel.leftAnchor.constraint(equalTo: self.callToActionView.leftAnchor, constant: 7.0),
+            _callToActionLabel.topAnchor.constraint(equalTo: self.callToActionView.topAnchor, constant: 5.0),
+            _callToActionLabel.bottomAnchor.constraint(equalTo: self.callToActionView.bottomAnchor, constant: -5.0),
+            
+            callToActionView.rightAnchor.constraint(equalTo: self.topStack.rightAnchor),
+            callToActionView.bottomAnchor.constraint(equalTo: self.topStack.bottomAnchor),
+            
+            _adChoiceView.rightAnchor.constraint(equalTo: self.topStack.rightAnchor, constant: -2.0),
+            _adChoiceView.topAnchor.constraint(equalTo: self.topStack.topAnchor, constant: 2.0)
         ])
     }
 }
