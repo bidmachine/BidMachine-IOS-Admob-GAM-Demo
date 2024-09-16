@@ -171,6 +171,42 @@
     [self loadAdManagerNativeWith:nil];
 }
 
+- (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didDismissScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
+    
+}
+
+- (void)didPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackImpression:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didTrackInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)didUserInteraction:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)willPresentScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
 #pragma mark - GADNativeAdLoaderDelegate
 
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(NSError *)error {
