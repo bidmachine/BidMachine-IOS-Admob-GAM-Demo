@@ -6,7 +6,7 @@
 
 #import "Native.h"
 
-#define UNIT_ID         "/22897248656/bidmachine_test/native"
+#define UNIT_ID         "your unit ID here"
 
 @interface Native ()<BidMachineAdDelegate, GADNativeAdLoaderDelegate>
 
@@ -82,17 +82,20 @@
 }
 
 - (void)layoutAdManagerNativeView {
+    /* Set up GADNativeAdView following the instructions at:
+       https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced */
+    
     GADNativeAdView* googleView = [GADNativeAdView new];
     googleView.nativeAd = self.googleNativeAd;
-    
-    #warning populate with data and layout in container?
 }
 
 - (void)resetNative {
+    [self.bidMachineNativeAd unregisterView];
+
     self.bidMachineNativeAd = nil;
     self.googleNativeAd = nil;
     self.adLoader = nil;
-    [self.adContainer.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.adContainer.subviews enumerateObjectsUsingBlock:^(UIView *subview, NSUInteger idx, BOOL *stop) {
         [subview removeFromSuperview];
     }];
 }
@@ -117,7 +120,7 @@
 - (void)loadAdManagerNativeWith:(id<BidMachineAdProtocol> _Nullable)ad {
     GAMRequest *googleRequest = [GAMRequest request];
 
-    NSString *price = @"1.00"; // [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
+    NSString *price = [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
     if (ad) {
         googleRequest.customTargeting = @{ @"bm_pf" : price };
     }
@@ -143,7 +146,6 @@
 }
 
 - (void)onBidMachineLoss {
-    #warning android implementation has such method without parameters
     [BidMachineSdk.shared notifyMediationLoss:@"unknown" ecpm:0.0 ad:self.bidMachineNativeAd];
     self.bidMachineNativeAd = nil;
 }

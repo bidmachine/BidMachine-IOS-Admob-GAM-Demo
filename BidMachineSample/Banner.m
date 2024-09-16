@@ -6,7 +6,7 @@
 
 #import "Banner.h"
 
-#define UNIT_ID         "/22897248656/bidmachine_test/banner"
+#define UNIT_ID         "your unit ID here"
 
 @interface Banner ()<BidMachineAdDelegate, GADBannerViewDelegate, GADAppEventDelegate>
 
