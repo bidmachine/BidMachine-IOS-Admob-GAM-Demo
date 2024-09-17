@@ -6,7 +6,7 @@
 
 #import "Interstitial.h"
 
-#define UNIT_ID         "/91759738/bm_interstitial"
+#define UNIT_ID         "your unit ID here"
 
 @interface Interstitial ()<BidMachineAdDelegate, GADAppEventDelegate>
 

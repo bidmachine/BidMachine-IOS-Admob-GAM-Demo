@@ -6,7 +6,7 @@
 
 #import "Rewarded.h"
 
-#define UNIT_ID         "/91759738/bm_rewarded"
+#define UNIT_ID         "your unit ID here"
 
 @interface Rewarded ()<BidMachineAdDelegate, GADAdMetadataDelegate>
 
