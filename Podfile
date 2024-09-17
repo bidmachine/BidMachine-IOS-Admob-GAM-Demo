@@ -1,4 +1,5 @@
 platform :ios, '12.0'
+use_frameworks!
 
 source 'https://github.com/appodeal/CocoaPods.git'
 source 'https://cdn.cocoapods.org/'
@@ -6,7 +7,7 @@ source 'https://cdn.cocoapods.org/'
 install! 'cocoapods', :deterministic_uuids => false, :warn_for_multiple_pod_sources => false
 
 $BDMVersion = '~> 3.0.1'
-$GAMVersion = '~> 11.5.0'
+$GAMVersion = '~> 11.9.0'
 
 def bidmachine
   pod 'BidMachine', $BDMVersion
