@@ -17,6 +17,7 @@
 		0100BE172C9C290E006E56A0 /* InterstitialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0100BE162C9C290E006E56A0 /* InterstitialViewController.swift */; };
 		0100BE192C9C29E3006E56A0 /* RewardedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0100BE182C9C29E3006E56A0 /* RewardedViewController.swift */; };
 		0100BE1B2C9C2A16006E56A0 /* NativeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0100BE1A2C9C2A16006E56A0 /* NativeViewController.swift */; };
+		0131BA9D2C9C79FD00B07FEE /* NativeAdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0131BA9C2C9C79FD00B07FEE /* NativeAdView.swift */; };
 		01C05F782C9C4E590000CE3F /* NumberFormatter+BidMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C05F772C9C4E590000CE3F /* NumberFormatter+BidMachine.swift */; };
 		01C05F7B2C9C6F490000CE3F /* GAMRequest+BidMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C05F7A2C9C6F490000CE3F /* GAMRequest+BidMachine.swift */; };
 		6A26CB508E761300DC28ADDB /* Pods_BidMachineSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99C9120B19FF0F59A5F94C43 /* Pods_BidMachineSample.framework */; };
@@ -35,6 +36,7 @@
 		0100BE162C9C290E006E56A0 /* InterstitialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstitialViewController.swift; sourceTree = "<group>"; };
 		0100BE182C9C29E3006E56A0 /* RewardedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardedViewController.swift; sourceTree = "<group>"; };
 		0100BE1A2C9C2A16006E56A0 /* NativeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeViewController.swift; sourceTree = "<group>"; };
+		0131BA9C2C9C79FD00B07FEE /* NativeAdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdView.swift; sourceTree = "<group>"; };
 		01C05F772C9C4E590000CE3F /* NumberFormatter+BidMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NumberFormatter+BidMachine.swift"; sourceTree = "<group>"; };
 		01C05F7A2C9C6F490000CE3F /* GAMRequest+BidMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GAMRequest+BidMachine.swift"; sourceTree = "<group>"; };
 		4FE7AB25E9327FF8845A1C11 /* Pods-BidMachineSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BidMachineSample.release.xcconfig"; path = "Target Support Files/Pods-BidMachineSample/Pods-BidMachineSample.release.xcconfig"; sourceTree = "<group>"; };
@@ -102,9 +104,18 @@
 				0100BE142C9C24B7006E56A0 /* BannerViewController.swift */,
 				0100BE162C9C290E006E56A0 /* InterstitialViewController.swift */,
 				0100BE182C9C29E3006E56A0 /* RewardedViewController.swift */,
-				0100BE1A2C9C2A16006E56A0 /* NativeViewController.swift */,
+				0131BA9B2C9C79EF00B07FEE /* Native */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		0131BA9B2C9C79EF00B07FEE /* Native */ = {
+			isa = PBXGroup;
+			children = (
+				0100BE1A2C9C2A16006E56A0 /* NativeViewController.swift */,
+				0131BA9C2C9C79FD00B07FEE /* NativeAdView.swift */,
+			);
+			path = Native;
 			sourceTree = "<group>";
 		};
 		01C05F792C9C60340000CE3F /* Extensions */ = {
@@ -268,6 +279,7 @@
 				0100BDFF2C9C1AC5006E56A0 /* AdLoadController.swift in Sources */,
 				0100BE0F2C9C1B35006E56A0 /* AppModule.swift in Sources */,
 				0100BE172C9C290E006E56A0 /* InterstitialViewController.swift in Sources */,
+				0131BA9D2C9C79FD00B07FEE /* NativeAdView.swift in Sources */,
 				01C05F7B2C9C6F490000CE3F /* GAMRequest+BidMachine.swift in Sources */,
 				0100BE1B2C9C2A16006E56A0 /* NativeViewController.swift in Sources */,
 				0100BE122C9C214E006E56A0 /* AdType.swift in Sources */,

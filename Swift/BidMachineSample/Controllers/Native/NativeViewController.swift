@@ -1,8 +1,5 @@
 //
-//  InterstitialViewController.swift
-//  BidMachineSample
-//
-//  Created by Dzmitry on 19/09/2024.
+//  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import UIKit
@@ -10,10 +7,9 @@ import BidMachine
 import GoogleMobileAds
 
 private enum Constant {
-    static let nativeName = "bidmachine"
-    static let nativeUnitID = "/22897248656/bidmachine_test/native" // "your unit id here"
+    static let advertiser = "bidmachine"
+    static let nativeUnitID = "your unit id here"
 }
-
 
 final class NativeViewController: AdLoadController {
     private let nativeViewContainer = UIView()
@@ -26,10 +22,6 @@ final class NativeViewController: AdLoadController {
         "Native"
     }
 
-    override func setupSubviews() {
-        super.setupSubviews()
-    }
-
     override func layoutContent() {
         super.layoutContent()
         
@@ -37,9 +29,9 @@ final class NativeViewController: AdLoadController {
         view.addSubview(nativeViewContainer)
         
         NSLayoutConstraint.activate([
-            nativeViewContainer.centerXAnchor.constraint(equalTo: contentLayoutGuide.centerXAnchor),
-            nativeViewContainer.widthAnchor.constraint(lessThanOrEqualTo: contentLayoutGuide.widthAnchor),
-            nativeViewContainer.heightAnchor.constraint(lessThanOrEqualTo: contentLayoutGuide.heightAnchor),
+            nativeViewContainer.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor, constant: 5.0),
+            nativeViewContainer.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor, constant: -5.0),
+            nativeViewContainer.heightAnchor.constraint(equalToConstant: 400),
             nativeViewContainer.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor)
         ])
     }
@@ -62,6 +54,30 @@ final class NativeViewController: AdLoadController {
     }
     
     override func showAd() {
+        switchState(to: .idle)
+
+        guard let bidMachineNativeAd, bidMachineNativeAd.canShow else {
+            showAlert(with: "No native ad to show, show google ad if possible")
+            return
+        }
+        let adView = NativeAdView()
+        
+        bidMachineNativeAd.controller = self
+        do {
+            try bidMachineNativeAd.presentAd(nativeViewContainer, adView)
+            adView.translatesAutoresizingMaskIntoConstraints = false
+            nativeViewContainer.addSubview(adView)
+            
+            NSLayoutConstraint.activate([
+                adView.topAnchor.constraint(equalTo: nativeViewContainer.topAnchor),
+                adView.bottomAnchor.constraint(equalTo: nativeViewContainer.bottomAnchor),
+                adView.leadingAnchor.constraint(equalTo: nativeViewContainer.leadingAnchor),
+                adView.trailingAnchor.constraint(equalTo: nativeViewContainer.trailingAnchor)
+            ])
+        } catch let error {
+            switchState(to: .idle)
+            showAlert(with: "Error ocured: \(error.localizedDescription)")
+        }
     }
     
     private func deleteLoadedAd() {
@@ -94,12 +110,25 @@ extension NativeViewController: BidMachineAdDelegate {
     }
 }
 
-extension NativeViewController: GADAdLoaderDelegate {
-    func adLoaderDidFinishLoading(_ adLoader: GADAdLoader) {
-        let bidMachineWon = ad
+extension NativeViewController: GADNativeAdLoaderDelegate {
+    func adLoader(_ adLoader: GADAdLoader, didReceive nativeAd: GADNativeAd) {
+        let bidMachineWon = nativeAd.advertiser == Constant.advertiser
+        
+        if bidMachineWon {
+            BidMachineSdk.shared.notifyMediationWin(bidMachineNativeAd!)
+            switchState(to: .loaded)
+        } else {
+            BidMachineSdk.shared.notifyMediationLoss("", 0.0, bidMachineNativeAd!)
+            bidMachineNativeAd = nil
+
+            // fallback to google native ad
+            switchState(to: .idle)
+            showAlert(with: "Google ad loaded. Advertiser: \(nativeAd.advertiser ?? "none")")
+        }
     }
 
     func adLoader(_ adLoader: GADAdLoader, didFailToReceiveAdWithError error: any Error) {
-        <#code#>
+        switchState(to: .idle)
+        showAlert(with: "Error ocured: \(error.localizedDescription)")
     }
 }

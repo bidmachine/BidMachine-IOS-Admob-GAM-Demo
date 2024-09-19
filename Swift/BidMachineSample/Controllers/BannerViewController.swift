@@ -1,8 +1,5 @@
 //
-//  BanneViewController.swift
-//  BidMachineSample
-//
-//  Created by Dzmitry on 19/09/2024.
+//  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import UIKit
@@ -11,7 +8,7 @@ import GoogleMobileAds
 
 private enum Constant {
     static let bmBannerName = "bidmachine-banner"
-    static let bannerUnitID = "/22897248656/bidmachine_test/banner" // "your unit id here"
+    static let bannerUnitID = "your unit id here"
 }
 
 final class BannerViewController: AdLoadController {
@@ -111,7 +108,7 @@ extension BannerViewController: GADAppEventDelegate {
         default:
             switchState(to: .idle)
 
-            // fallback to google interstitial
+            // fallback to google banner
             showAlert(with: "Google ad loaded with name: \(name)")
         }
     }

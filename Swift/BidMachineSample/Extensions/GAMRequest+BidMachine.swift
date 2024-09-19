@@ -1,8 +1,5 @@
 //
-//  GAMRequest+BidMachine.swift
-//  BidMachineSample
-//
-//  Created by Dzmitry on 19/09/2024.
+//  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import Foundation
@@ -11,14 +8,11 @@ import BidMachine
 
 extension GAMRequest {
     static func withBidMachineAdTargeting(_ ad: BidMachineAdProtocol) -> GAMRequest {
-        var targeting = [String: String]()
+        let request = GAMRequest()
         let price = NumberFormatter.bidMachinePrice.string(
             from: NSNumber(value: ad.auctionInfo.price)
-        )
-        targeting["bm_pf"] = "1.00" // price
-        
-        let request = GAMRequest()
-        request.customTargeting = targeting
+        )!
+        request.customTargeting = ["bm_pf": price]
         
         return request
     }

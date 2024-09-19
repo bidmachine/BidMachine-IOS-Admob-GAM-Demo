@@ -1,8 +1,5 @@
 //
-//  RewardedViewController.swift
-//  BidMachineSample
-//
-//  Created by Dzmitry on 19/09/2024.
+//  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import UIKit
@@ -11,7 +8,7 @@ import GoogleMobileAds
 
 private enum Constant {
     static let rewardedName = "bidmachine-rewarded"
-    static let rewardedUnitID = "/22897248656/bidmachine_test/rewarded" // "your unit id here"
+    static let rewardedUnitID = "your unit id here"
 }
 
 final class RewardedViewController: AdLoadController {

@@ -1,8 +1,5 @@
 //
-//  AdTab.swift
-//  BidMachineSample
-//
-//  Created by Dzmitry on 19/09/2024.
+//  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import UIKit

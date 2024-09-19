@@ -1,8 +1,5 @@
 //
-//  InterstitialViewController.swift
-//  BidMachineSample
-//
-//  Created by Dzmitry on 19/09/2024.
+//  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import UIKit
@@ -11,7 +8,7 @@ import BidMachine
 
 private enum Constant {
     static let interstitialName = "bidmachine-interstitial"
-    static let interstitialUnitID = "/22897248656/bidmachine_test/interstitial" // "your unit id here"
+    static let interstitialUnitID = "your unit id here"
 }
 
 final class InterstitialViewController: AdLoadController {
@@ -72,8 +69,7 @@ extension InterstitialViewController: BidMachineAdDelegate {
             }
         }
     }
-    
-    
+
     func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
         showAlert(with: "Error ocured: \(error.localizedDescription)")
