@@ -11,7 +11,7 @@ import BidMachine
 
 private enum Constant {
     static let interstitialName = "bidmachine-interstitial"
-    static let interstitialUnitID = "your unit id here"
+    static let interstitialUnitID = "/22897248656/bidmachine_test/interstitial" // "your unit id here"
 }
 
 final class InterstitialViewController: AdLoadController {
@@ -57,14 +57,7 @@ final class InterstitialViewController: AdLoadController {
 
 extension InterstitialViewController: BidMachineAdDelegate {
     func didLoadAd(_ ad: any BidMachineAdProtocol) {
-        var targeting = [String: String]()
-        let price = NumberFormatter.bidMachinePrice.string(
-            from: NSNumber(value: ad.auctionInfo.price)
-        )
-        targeting["bm_pf"] = price
-        
-        let request = GAMRequest()
-        request.customTargeting = targeting
+        let request = GAMRequest.withBidMachineAdTargeting(ad)
         
         GAMInterstitialAd.load(
             withAdManagerAdUnitID: Constant.interstitialUnitID,

@@ -11,7 +11,7 @@ import GoogleMobileAds
 
 private enum Constant {
     static let bmBannerName = "bidmachine-banner"
-    static let bannerUnitID = "your unit id here"
+    static let bannerUnitID = "/22897248656/bidmachine_test/banner" // "your unit id here"
 }
 
 final class BannerViewController: AdLoadController {
@@ -92,15 +92,7 @@ extension BannerViewController: BidMachineAdDelegate {
         self.googleBanner?.appEventDelegate = self
         self.googleBanner?.rootViewController = self
         
-        var targeting = [String: String]()
-
-        let price = NumberFormatter.bidMachinePrice.string(
-            from: NSNumber(value: ad.auctionInfo.price)
-        )
-        targeting["bm_pf"] = price
-        
-        let request = GAMRequest()
-        request.customTargeting = targeting
+        let request = GAMRequest.withBidMachineAdTargeting(ad)
         
         self.googleBanner?.load(request)
     }
