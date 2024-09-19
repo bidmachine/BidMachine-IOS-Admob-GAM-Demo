@@ -45,6 +45,7 @@ final class BannerViewController: AdLoadController {
         BidMachineSdk.shared.banner { [weak self] (banner, error) in
             guard error == nil else {
                 self?.switchState(to: .idle)
+                self?.showAlert(with: "Error ocured: \(error?.localizedDescription ?? "")")
                 return
             }
             
@@ -58,7 +59,8 @@ final class BannerViewController: AdLoadController {
     override func showAd() {
         switchState(to: .idle)
 
-        guard let bidmachineBanner else {
+        guard let bidmachineBanner, bidmachineBanner.canShow else {
+            showAlert(with: "No banner to show")
             return
         }
 
@@ -105,6 +107,7 @@ extension BannerViewController: BidMachineAdDelegate {
     
     func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
+        showAlert(with: "Error ocured: \(error.localizedDescription)")
     }
 }
 
@@ -115,6 +118,7 @@ extension BannerViewController: GADAppEventDelegate {
             switchState(to: .loaded)
         default:
             switchState(to: .idle)
+            showAlert(with: "Google ad loaded with name: \(name)")
         }
     }
 }
@@ -122,5 +126,6 @@ extension BannerViewController: GADAppEventDelegate {
 extension BannerViewController: GADBannerViewDelegate {
     func bannerView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: any Error) {
         switchState(to: .idle)
+        showAlert(with: "Error ocured: \(error.localizedDescription)")
     }
 }

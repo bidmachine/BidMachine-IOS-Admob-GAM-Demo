@@ -77,8 +77,8 @@
 				0100BE0E2C9C1B35006E56A0 /* AppModule.swift */,
 				0100BE112C9C214E006E56A0 /* AdType.swift */,
 				0100BE132C9C2491006E56A0 /* Controllers */,
+				01C05F792C9C60340000CE3F /* Extensions */,
 				0100BE102C9C1BC0006E56A0 /* SupportingFiles */,
-				01C05F772C9C4E590000CE3F /* NumberFormatter+BidMachine.swift */,
 			);
 			path = BidMachineSample;
 			sourceTree = "<group>";
@@ -103,6 +103,14 @@
 				0100BE1A2C9C2A16006E56A0 /* NativeViewController.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		01C05F792C9C60340000CE3F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				01C05F772C9C4E590000CE3F /* NumberFormatter+BidMachine.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		9C625EDBFB016509DA9BD272 /* Pods */ = {

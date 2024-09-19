@@ -44,6 +44,7 @@ class AdLoadController: UIViewController {
         
         setupSubviews()
         layoutContent()
+        switchState(to: .idle)
     }
     
     func layoutContent() {
@@ -105,6 +106,16 @@ class AdLoadController: UIViewController {
             showButton.isEnabled = true
             activityIndicator.stopAnimating()
         }
+    }
+}
+
+extension AdLoadController {
+    final func showAlert(with text: String) {
+        let controller = UIAlertController(title: "Opps", message: text, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        
+        controller.addAction(okAction)
+        present(controller, animated: true)
     }
 }
 
