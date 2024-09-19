@@ -118,6 +118,8 @@ extension BannerViewController: GADAppEventDelegate {
             switchState(to: .loaded)
         default:
             switchState(to: .idle)
+
+            // fallback to google interstitial
             showAlert(with: "Google ad loaded with name: \(name)")
         }
     }
