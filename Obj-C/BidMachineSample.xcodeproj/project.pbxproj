@@ -46,7 +46,7 @@
 		659EB65E23DB2B2E004F4550 /* Interstitial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Interstitial.m; sourceTree = "<group>"; };
 		659EB65F23DB2B2F004F4550 /* Banner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Banner.m; sourceTree = "<group>"; };
 		659EB66223DB2B2F004F4550 /* Banner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Banner.h; sourceTree = "<group>"; };
-		65C52A492980051800261B34 /* BidMachineSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BidMachineSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65C52A492980051800261B34 /* BidMachineSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = BidMachineSample.app; path = "/Users/dzmitry/Work/BidMachine-IOS-GAM-Demo/Obj-C/build/Debug-iphoneos/BidMachineSample.app"; sourceTree = "<absolute>"; };
 		71BF3BC98A73AB57CE645BAB /* Pods_BidMachineSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BidMachineSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		836B00D5D4EE8A54298BE6CD /* Pods-BidMachineSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BidMachineSample.debug.xcconfig"; path = "Target Support Files/Pods-BidMachineSample/Pods-BidMachineSample.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +94,6 @@
 		659EB5F923DB2710004F4550 = {
 			isa = PBXGroup;
 			children = (
-				65C52A492980051800261B34 /* BidMachineSample.app */,
 				659EB60423DB2710004F4550 /* BidMachineSample */,
 				557BF368B5174F4DD037E36D /* Pods */,
 				709C1B0CF3898721FFC16788 /* Frameworks */,
