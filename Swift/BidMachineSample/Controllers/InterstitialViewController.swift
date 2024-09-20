@@ -26,7 +26,7 @@ final class InterstitialViewController: AdLoadController {
         BidMachineSdk.shared.interstitial { [weak self] interstitial, error in
             if let error {
                 self?.switchState(to: .idle)
-                self?.showAlert(with: "Error ocured: \(error.localizedDescription)")
+                self?.showAlert(with: "Error occurred: \(error.localizedDescription)")
             } else {
                 self?.bidmachineInterstitial = interstitial
                 self?.bidmachineInterstitial?.controller = self
@@ -62,7 +62,7 @@ extension InterstitialViewController: BidMachineAdDelegate {
         ) { [weak self] interstitial, error in
             if let error {
                 self?.switchState(to: .idle)
-                self?.showAlert(with: "Error ocured: \(error.localizedDescription)")
+                self?.showAlert(with: "Error occurred: \(error.localizedDescription)")
             } else {
                 self?.googleInterstitial = interstitial
                 self?.googleInterstitial?.appEventDelegate = self
@@ -72,7 +72,7 @@ extension InterstitialViewController: BidMachineAdDelegate {
 
     func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
-        showAlert(with: "Error ocured: \(error.localizedDescription)")
+        showAlert(with: "Error occurred: \(error.localizedDescription)")
     }
 }
 

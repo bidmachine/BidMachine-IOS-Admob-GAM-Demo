@@ -43,7 +43,7 @@ final class NativeViewController: AdLoadController {
         BidMachineSdk.shared.native { [weak self] nativeAd, error in
             if let error {
                 self?.switchState(to: .idle)
-                self?.showAlert(with: "Error ocured: \(error.localizedDescription)")
+                self?.showAlert(with: "Error occurred: \(error.localizedDescription)")
             } else {
                 self?.bidMachineNativeAd = nativeAd
                 self?.bidMachineNativeAd?.controller = self
@@ -76,7 +76,7 @@ final class NativeViewController: AdLoadController {
             ])
         } catch let error {
             switchState(to: .idle)
-            showAlert(with: "Error ocured: \(error.localizedDescription)")
+            showAlert(with: "Error occurred: \(error.localizedDescription)")
         }
     }
     
@@ -106,7 +106,7 @@ extension NativeViewController: BidMachineAdDelegate {
     
     func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
-        showAlert(with: "Error ocured: \(error.localizedDescription)")
+        showAlert(with: "Error occurred: \(error.localizedDescription)")
     }
 }
 
@@ -129,6 +129,6 @@ extension NativeViewController: GADNativeAdLoaderDelegate {
 
     func adLoader(_ adLoader: GADAdLoader, didFailToReceiveAdWithError error: any Error) {
         switchState(to: .idle)
-        showAlert(with: "Error ocured: \(error.localizedDescription)")
+        showAlert(with: "Error occurred: \(error.localizedDescription)")
     }
 }

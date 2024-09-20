@@ -62,7 +62,7 @@ extension RewardedViewController: BidMachineAdDelegate {
         ) { [weak self] rewarded, error in
             if let error {
                 self?.switchState(to: .idle)
-                self?.showAlert(with: "Error ocured: \(error.localizedDescription)")
+                self?.showAlert(with: "Error occurred: \(error.localizedDescription)")
             } else {
                 self?.googleRewarded = rewarded
                 self?.googleRewarded?.adMetadataDelegate = self
@@ -72,7 +72,7 @@ extension RewardedViewController: BidMachineAdDelegate {
     
     public func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
-        showAlert(with: "Error ocured: \(error.localizedDescription)")
+        showAlert(with: "Error occurred: \(error.localizedDescription)")
     }
 }
 
