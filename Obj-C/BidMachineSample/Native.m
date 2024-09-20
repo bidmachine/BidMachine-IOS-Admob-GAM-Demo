@@ -66,7 +66,7 @@
 }
 
 - (void)layoutBidMachineNativeView {
-    NativeAdView *adView = [NativeAdView new];
+    BMNativeAdView *adView = [BMNativeAdView new];
     NSError *error;
     self.bidMachineNativeAd.controller = self;
     [self.bidMachineNativeAd presentAd:self.adContainer :adView error:&error];
