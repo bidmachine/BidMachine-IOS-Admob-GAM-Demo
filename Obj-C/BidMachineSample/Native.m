@@ -121,26 +121,6 @@
     }];
 }
 
-- (void)loadAdManagerNativeWith:(id<BidMachineAdProtocol> _Nullable)ad {
-    GAMRequest *googleRequest = [GAMRequest request];
-
-    if (ad) {
-        NSString *price = [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
-        googleRequest.customTargeting = @{ @"bm_pf" : price };
-    }
-
-    self.adLoader = [
-        [GADAdLoader alloc]
-        initWithAdUnitID:@UNIT_ID
-        rootViewController:self
-        adTypes:@[ GADAdLoaderAdTypeNative ]
-        options:nil
-    ];
-
-    self.adLoader.delegate = self;
-    [self.adLoader loadRequest:googleRequest];
-}
-
 - (void)onBidMachineWin {
     [BidMachineSdk.shared notifyMediationWin:self.bidMachineNativeAd];
     
@@ -164,11 +144,28 @@
 #pragma mark - BidMachineAdDelegate
 
 - (void)didLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad {
-    [self loadAdManagerNativeWith:ad];
+    GAMRequest *googleRequest = [GAMRequest request];
+
+    NSString *price = [self.formatter stringFromNumber:@(ad.auctionInfo.price)];
+    googleRequest.customTargeting = @{ @"bm_pf" : price };
+
+    self.adLoader = [
+        [GADAdLoader alloc]
+        initWithAdUnitID:@UNIT_ID
+        rootViewController:self
+        adTypes:@[ GADAdLoaderAdTypeNative ]
+        options:nil
+    ];
+
+    self.adLoader.delegate = self;
+    [self.adLoader loadRequest:googleRequest];
 }
 
 - (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
-    [self loadAdManagerNativeWith:nil];
+    [self.bidMachineNativeAd unregisterView];
+    self.bidMachineNativeAd = nil;
+
+    // unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
 }
 
 - (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
@@ -217,7 +214,9 @@
     BOOL bidMachineWon = [self isBidMachineAd:nativeAd];
     
     if (bidMachineWon) {
-        [self onBidMachineWin];
+        if (self.bidMachineNativeAd) {
+            [self onBidMachineWin];
+        }
     } else {
         self.googleNativeAd = nativeAd;
         [self onBidMachineLoss];
