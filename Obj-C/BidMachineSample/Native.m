@@ -22,24 +22,32 @@
 @implementation Native
 
 - (void)loadAd:(id)sender {
+    [self deleteLoadedAd];
     [self switchState:BSStateLoading];
-    [self loadNative];
+    
+    __weak typeof(self) weakSelf = self;
+    [BidMachineSdk.shared native:nil :^(BidMachineNative *native, NSError *error) {
+        if (error) {
+            [weakSelf switchState: BSStateIdle];
+            NSLog(@"Native ad request finished with error %@",error.localizedDescription);
+            return;
+        }
+        weakSelf.bidMachineNativeAd = native;
+        weakSelf.bidMachineNativeAd.controller = weakSelf;
+        weakSelf.bidMachineNativeAd.delegate = weakSelf;
+        [weakSelf.bidMachineNativeAd loadAd];
+    }];
 }
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
 
-    if (self.bidMachineNativeAd) {
-        if (self.bidMachineNativeAd.canShow) {
-            [self layoutBidMachineNativeView];
-        } else {
-            NSLog(@"Bid Machine ad object can't be shown");
-        }
-    } else if (self.googleNativeAd) {
-        [self layoutAdManagerNativeView];
-    } else {
-        NSLog(@"No ad to display");
+    if (self.bidMachineNativeAd && self.bidMachineNativeAd.canShow) {
+        [self layoutBidMachineNativeView];
+        return;
     }
+    // No BidMachine native to show.
+    // Fallback to Google native ad (instructions: https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced) or implement your own fallback logic.
 }
 
 - (void)viewDidLoad {
@@ -68,15 +76,18 @@
 - (void)layoutBidMachineNativeView {
     BMNativeAdView *adView = [BMNativeAdView new];
     NSError *error;
+
     self.bidMachineNativeAd.controller = self;
     [self.bidMachineNativeAd presentAd:self.adContainer :adView error:&error];
     
     if (error) {
+        [self switchState: BSStateIdle];
+        // Unable to display the BidMachine ad. Implement your fallback logic here.
         return;
     }
     
-    adView.translatesAutoresizingMaskIntoConstraints = false;
     [self.adContainer addSubview:adView];
+    adView.translatesAutoresizingMaskIntoConstraints = false;
     [NSLayoutConstraint activateConstraints:
      @[
         [adView.topAnchor constraintEqualToAnchor:self.adContainer.topAnchor],
@@ -84,13 +95,6 @@
         [adView.leadingAnchor constraintEqualToAnchor:self.adContainer.leadingAnchor],
         [adView.trailingAnchor constraintEqualToAnchor:self.adContainer.trailingAnchor],
     ]];
-}
-
-- (void)layoutAdManagerNativeView {
-    GADNativeAdView* googleAdView = [GADNativeAdView new];
-    googleAdView.nativeAd = self.googleNativeAd;
-
-    // Set up GADNativeAdView following the instructions at: https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced
 }
 
 - (void)deleteLoadedAd {
@@ -102,43 +106,6 @@
     [self.adContainer.subviews enumerateObjectsUsingBlock:^(UIView *subview, NSUInteger idx, BOOL *stop) {
         [subview removeFromSuperview];
     }];
-}
-
-- (void)loadNative {
-    [self deleteLoadedAd];
-
-    __weak typeof(self) weakSelf = self;
-    [BidMachineSdk.shared native:nil :^(BidMachineNative *native, NSError *error) {
-        if (error) {
-            [weakSelf switchState: BSStateIdle];
-            NSLog(@"Native ad request finished with error %@",error.localizedDescription);
-            return;
-        }
-        weakSelf.bidMachineNativeAd = native;
-        weakSelf.bidMachineNativeAd.controller = weakSelf;
-        weakSelf.bidMachineNativeAd.delegate = weakSelf;
-        [weakSelf.bidMachineNativeAd loadAd];
-    }];
-}
-
-- (void)onBidMachineWin {
-    [BidMachineSdk.shared notifyMediationWin:self.bidMachineNativeAd];
-    
-    if (self.bidMachineNativeAd.canShow) {
-        [self switchState:BSStateReady];
-    }
-}
-
-- (void)onBidMachineLoss {
-    [BidMachineSdk.shared notifyMediationLoss:@"" ecpm:0.0 ad:self.bidMachineNativeAd];
-    self.bidMachineNativeAd = nil;
-}
-
-- (BOOL)isBidMachineAd:(GADNativeAd *)nativeAd {
-    if (!nativeAd.advertiser) {
-        return NO;
-    }
-    return [nativeAd.advertiser isEqualToString:@ADVERTISER];
 }
 
 #pragma mark - BidMachineAdDelegate
@@ -162,13 +129,17 @@
 }
 
 - (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
-    [self.bidMachineNativeAd unregisterView];
+    [self switchState: BSStateIdle];
     self.bidMachineNativeAd = nil;
 
-    // unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
+    // Unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
 }
 
 - (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
+    
+}
+
+- (void)willPresentScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
     
 }
 
@@ -177,7 +148,8 @@
 }
 
 - (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
-    
+    [self switchState: BSStateIdle];
+    [self deleteLoadedAd];
 }
 
 - (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
@@ -200,10 +172,6 @@
     
 }
 
-- (void)willPresentScreen:(id<BidMachineAdProtocol> _Nonnull)ad {
-    
-}
-
 #pragma mark - GADNativeAdLoaderDelegate
 
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(NSError *)error {
@@ -211,15 +179,18 @@
 }
 
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveNativeAd:(GADNativeAd *)nativeAd {
-    BOOL bidMachineWon = [self isBidMachineAd:nativeAd];
-    
+    BOOL bidMachineWon = [nativeAd.advertiser isEqualToString:@ADVERTISER];
+
     if (bidMachineWon) {
-        if (self.bidMachineNativeAd) {
-            [self onBidMachineWin];
-        }
+        [BidMachineSdk.shared notifyMediationWin:self.bidMachineNativeAd];
+        [self switchState:BSStateReady];
     } else {
+        [BidMachineSdk.shared notifyMediationLoss:@"" ecpm:0.0 ad:self.bidMachineNativeAd];
+        self.bidMachineNativeAd = nil;
+        
+        // BidMachine lost. Fallback to Google native ad or implement your own fallback logic.
         self.googleNativeAd = nativeAd;
-        [self onBidMachineLoss];
+        [self switchState:BSStateIdle];
     }
 }
 

@@ -20,6 +20,7 @@
 @implementation Banner
 
 - (void)loadAd:(id)sender {
+    [self deleteLoadedAd];
     [self switchState:BSStateLoading];
     
     __weak typeof(self) weakSelf = self;
@@ -37,7 +38,12 @@
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-    [self addBanner:self.bidmachineBanner inContainer:self.container];
+    
+    if (self.bidmachineBanner && self.bidmachineBanner.canShow) {
+        [self addBanner:self.bidmachineBanner inContainer:self.container];
+        return;
+    }
+    // No BidMachine banner to show. Fallback to Google native ad or implement your own fallback logic.
 }
 
 - (void)addBanner:(UIView *)banner inContainer:(UIView *)container {
@@ -45,13 +51,21 @@
     [container.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [container addSubview:banner];
     banner.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:
-        @[
-          [banner.centerXAnchor constraintEqualToAnchor:container.centerXAnchor],
-          [banner.centerYAnchor constraintEqualToAnchor:container.centerYAnchor],
-          [banner.widthAnchor constraintEqualToConstant: 320],
-          [banner.heightAnchor constraintEqualToConstant:50]
-          ]];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [banner.centerXAnchor constraintEqualToAnchor:container.centerXAnchor],
+        [banner.centerYAnchor constraintEqualToAnchor:container.centerYAnchor],
+        [banner.widthAnchor constraintEqualToConstant: 320],
+        [banner.heightAnchor constraintEqualToConstant:50]
+    ]];
+}
+
+- (void)deleteLoadedAd {
+    self.bidmachineBanner = nil;
+    self.googleBanner = nil;
+    [self.container.subviews enumerateObjectsUsingBlock:^(UIView *subview, NSUInteger idx, BOOL *stop) {
+        [subview removeFromSuperview];
+    }];
 }
 
 #pragma mark - BidMachineAdDelegate
@@ -73,6 +87,9 @@
 
 - (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     [self switchState:BSStateIdle];
+    self.bidmachineBanner = nil;
+    
+    // Unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
 }
 
 - (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
@@ -84,7 +101,8 @@
 }
 
 - (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
-    
+    [self deleteLoadedAd];
+    [self switchState:BSStateIdle];
 }
 
 - (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
@@ -126,9 +144,17 @@
 }
 
 - (void)adView:(nonnull GADBannerView *)banner didReceiveAppEvent:(nonnull NSString *)name withInfo:(nullable NSString *)info {
-    if ([name isEqualToString:@"bidmachine-banner"]) {
+    BOOL bidMachineWon = [name isEqualToString:@"bidmachine-banner"];
+
+    if (bidMachineWon) {
+        [BidMachineSdk.shared notifyMediationWin:self.bidmachineBanner];
         [self switchState:BSStateReady];
+        self.googleBanner = nil;
     } else {
+        [BidMachineSdk.shared notifyMediationLoss:@"" ecpm:0.0 ad:self.bidmachineBanner];
+        self.bidmachineBanner = nil;
+
+        // BidMachine lost. Fallback to Google native ad or implement your own fallback logic.
         [self switchState:BSStateIdle];
     }
 }
