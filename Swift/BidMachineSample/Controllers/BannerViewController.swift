@@ -43,15 +43,15 @@ final class BannerViewController: AdLoadController {
             guard let self else {
                 return
             }
-            if let error {
+            guard let banner else {
                 self.switchState(to: .idle)
-                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
-            } else {
-                self.bidmachineBanner = banner
-                self.bidmachineBanner?.controller = self
-                self.bidmachineBanner?.delegate = self
-                self.bidmachineBanner?.loadAd()
+                self.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+                return
             }
+            self.bidmachineBanner = banner
+            banner.controller = self
+            banner.delegate = self
+            banner.loadAd()
         }
     }
     

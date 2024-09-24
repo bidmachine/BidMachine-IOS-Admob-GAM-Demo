@@ -44,15 +44,15 @@ final class NativeViewController: AdLoadController {
             guard let self else {
                 return
             }
-            if let error {
+            guard let nativeAd else {
                 self.switchState(to: .idle)
-                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
-            } else {
-                self.bidMachineNativeAd = nativeAd
-                self.bidMachineNativeAd?.controller = self
-                self.bidMachineNativeAd?.delegate = self
-                self.bidMachineNativeAd?.loadAd()
+                self.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+                return
             }
+            self.bidMachineNativeAd = nativeAd
+            nativeAd.controller = self
+            nativeAd.delegate = self
+            nativeAd.loadAd()
         }
     }
     

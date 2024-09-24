@@ -27,15 +27,15 @@ final class RewardedViewController: AdLoadController {
             guard let self else {
                 return
             }
-            if let error {
+            guard let rewarded else {
                 self.switchState(to: .idle)
-                self.showAlert(with: error.localizedDescription)
-            } else {
-                self.bidMachineRewarded = rewarded
-                self.bidMachineRewarded?.controller = self
-                self.bidMachineRewarded?.delegate = self
-                self.bidMachineRewarded?.loadAd()
+                self.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+                return
             }
+            self.bidMachineRewarded = rewarded
+            rewarded.controller = self
+            rewarded.delegate = self
+            rewarded.loadAd()
         }
     }
     
@@ -68,13 +68,13 @@ extension RewardedViewController: BidMachineAdDelegate {
             guard let self else {
                 return
             }
-            if let error {
+            guard let rewarded else {
                 self.switchState(to: .idle)
-                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
-            } else {
-                self.googleRewarded = rewarded
-                self.googleRewarded?.adMetadataDelegate = self
+                self.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+                return
             }
+            self.googleRewarded = rewarded
+            rewarded.adMetadataDelegate = self
         }
     }
     

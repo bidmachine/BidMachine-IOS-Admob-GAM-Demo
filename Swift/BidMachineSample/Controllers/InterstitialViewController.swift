@@ -27,15 +27,15 @@ final class InterstitialViewController: AdLoadController {
             guard let self else {
                 return
             }
-            if let error {
+            guard let interstitial else {
                 self.switchState(to: .idle)
-                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
-            } else {
-                self.bidmachineInterstitial = interstitial
-                self.bidmachineInterstitial?.controller = self
-                self.bidmachineInterstitial?.delegate = self
-                self.bidmachineInterstitial?.loadAd()
+                self.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+                return
             }
+            self.bidmachineInterstitial = interstitial
+            interstitial.controller = self
+            interstitial.delegate = self
+            interstitial.loadAd()
         }
     }
     
@@ -68,14 +68,13 @@ extension InterstitialViewController: BidMachineAdDelegate {
             guard let self else {
                 return
             }
-
-            if let error {
+            guard let interstitial else {
                 self.switchState(to: .idle)
-                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
-            } else {
-                self.googleInterstitial = interstitial
-                self.googleInterstitial?.appEventDelegate = self
+                self.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+                return
             }
+            self.googleInterstitial = interstitial
+            interstitial.appEventDelegate = self
         }
     }
 
