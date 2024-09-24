@@ -24,14 +24,17 @@ final class RewardedViewController: AdLoadController {
         switchState(to: .loading)
         
         BidMachineSdk.shared.rewarded { [weak self] rewarded, error in
+            guard let self else {
+                return
+            }
             if let error {
-                self?.switchState(to: .idle)
-                self?.showAlert(with: error.localizedDescription)
+                self.switchState(to: .idle)
+                self.showAlert(with: error.localizedDescription)
             } else {
-                self?.bidMachineRewarded = rewarded
-                self?.bidMachineRewarded?.controller = self
-                self?.bidMachineRewarded?.delegate = self
-                self?.bidMachineRewarded?.loadAd()
+                self.bidMachineRewarded = rewarded
+                self.bidMachineRewarded?.controller = self
+                self.bidMachineRewarded?.delegate = self
+                self.bidMachineRewarded?.loadAd()
             }
         }
     }
@@ -41,6 +44,8 @@ final class RewardedViewController: AdLoadController {
         
         guard let bidMachineRewarded, bidMachineRewarded.canShow else {
             showAlert(with: "No rewarded to show")
+            // No BidMachine rewarded to show. Fallback to Google native ad or implement your own fallback logic.
+
             return
         }
         bidMachineRewarded.presentAd()
@@ -60,36 +65,78 @@ extension RewardedViewController: BidMachineAdDelegate {
             withAdUnitID: Constant.rewardedUnitID,
             request: request
         ) { [weak self] rewarded, error in
+            guard let self else {
+                return
+            }
             if let error {
-                self?.switchState(to: .idle)
-                self?.showAlert(with: "Error occurred: \(error.localizedDescription)")
+                self.switchState(to: .idle)
+                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
             } else {
-                self?.googleRewarded = rewarded
-                self?.googleRewarded?.adMetadataDelegate = self
+                self.googleRewarded = rewarded
+                self.googleRewarded?.adMetadataDelegate = self
             }
         }
     }
     
     public func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
+        bidMachineRewarded = nil
+        
+        // Unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
         showAlert(with: "Error occurred: \(error.localizedDescription)")
+    }
+    
+    func didDismissAd(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func willPresentScreen(_ ad: any BidMachineAdProtocol) {
+
+    }
+
+    func didDismissScreen(_ ad: any BidMachineAdProtocol) {
+
+    }
+
+    func didExpired(_ ad: any BidMachineAdProtocol) {
+        deleteLoadedAd()
+        switchState(to: .idle)
+        
+        // BidMachine ad has expired. Restart the ad loading process.
+    }
+    
+    func didFailPresentAd(_ ad: any BidMachineAdProtocol, _ error: any Error) {
+        
+    }
+    
+    func didTrackImpression(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func didTrackInteraction(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func didUserInteraction(_ ad: any BidMachineAdProtocol) {
+
     }
 }
 
 extension RewardedViewController: GADAdMetadataDelegate {
     func adMetadataDidChange(_ ad: any GADAdMetadataProvider) {
-        guard let adTitle = ad.adMetadata?[GADAdMetadataKey(rawValue: "AdTitle")] as? String else {
-            switchState(to: .idle)
-            return
-        }
-        switch adTitle {
-        case Constant.rewardedName:
-            switchState(to: .loaded)
-        default:
-            switchState(to: .idle)
+        let adTitle = ad.adMetadata?[GADAdMetadataKey(rawValue: "AdTitle")] as? String
+        let bidMachineWon = adTitle == Constant.rewardedName
 
-            // fallback to google rewarded
-            showAlert(with: "Google ad loaded with title: \(adTitle)")
+        if bidMachineWon {
+            bidMachineRewarded.map { BidMachineSdk.shared.notifyMediationWin($0) }
+            switchState(to: .loaded)
+        } else {
+            bidMachineRewarded.map { BidMachineSdk.shared.notifyMediationLoss("", 0.0, $0) }
+            bidMachineRewarded = nil
+
+            // BidMachine lost. Fallback to Google native ad or implement your own fallback logic.
+            switchState(to: .idle)
+            showAlert(with: "Google ad loaded with title: \(adTitle ?? "unknown")")
         }
     }
 }

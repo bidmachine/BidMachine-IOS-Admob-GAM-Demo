@@ -40,16 +40,18 @@ final class BannerViewController: AdLoadController {
         switchState(to: .loading)
 
         BidMachineSdk.shared.banner { [weak self] (banner, error) in
-            guard error == nil else {
-                self?.switchState(to: .idle)
-                self?.showAlert(with: "Error occurred: \(error?.localizedDescription ?? "")")
+            guard let self else {
                 return
             }
-            
-            self?.bidmachineBanner = banner
-            self?.bidmachineBanner?.controller = self
-            self?.bidmachineBanner?.delegate = self
-            self?.bidmachineBanner?.loadAd()
+            if let error {
+                self.switchState(to: .idle)
+                self.showAlert(with: "Error occurred: \(error.localizedDescription)")
+            } else {
+                self.bidmachineBanner = banner
+                self.bidmachineBanner?.controller = self
+                self.bidmachineBanner?.delegate = self
+                self.bidmachineBanner?.loadAd()
+            }
         }
     }
     
@@ -58,6 +60,8 @@ final class BannerViewController: AdLoadController {
 
         guard let bidmachineBanner, bidmachineBanner.canShow else {
             showAlert(with: "No banner to show")
+            // No BidMachine banner to show. Fallback to Google native ad or implement your own fallback logic.
+
             return
         }
 
@@ -83,40 +87,92 @@ final class BannerViewController: AdLoadController {
 
 extension BannerViewController: BidMachineAdDelegate {
     func didLoadAd(_ ad: any BidMachine.BidMachineAdProtocol) {
-        self.googleBanner = GAMBannerView(adSize: GADAdSizeBanner)
-        self.googleBanner?.adUnitID = Constant.bannerUnitID
-        self.googleBanner?.delegate = self
-        self.googleBanner?.appEventDelegate = self
-        self.googleBanner?.rootViewController = self
+        let banner = GAMBannerView(adSize: GADAdSizeBanner)
+
+        self.googleBanner = banner
+        banner.adUnitID = Constant.bannerUnitID
+        banner.delegate = self
+        banner.appEventDelegate = self
+        banner.rootViewController = self
         
         let request = GAMRequest.withBidMachineAdTargeting(ad)
         
-        self.googleBanner?.load(request)
+        banner.load(request)
     }
     
     func didFailLoadAd(_ ad: any BidMachine.BidMachineAdProtocol, _ error: any Error) {
         switchState(to: .idle)
+        bidmachineBanner = nil
+        
+        // Unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
         showAlert(with: "Error occurred: \(error.localizedDescription)")
+    }
+    
+    func didDismissAd(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func didDismissScreen(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func didExpired(_ ad: any BidMachineAdProtocol) {
+        deleteLoadedAd()
+        switchState(to: .idle)
+        
+        // BidMachine ad has expired. Restart the ad loading process.
+    }
+    
+    func didFailPresentAd(_ ad: any BidMachineAdProtocol, _ error: any Error) {
+        
+    }
+    
+    func didTrackImpression(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func didTrackInteraction(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func didUserInteraction(_ ad: any BidMachineAdProtocol) {
+
+    }
+    
+    func willPresentScreen(_ ad: any BidMachineAdProtocol) {
+
     }
 }
 
 extension BannerViewController: GADAppEventDelegate {
     func adView(_ banner: GADBannerView, didReceiveAppEvent name: String, withInfo info: String?) {
-        switch name {
-        case Constant.bmBannerName:
+        let bidMachineWon = name == Constant.bmBannerName
+        
+        if bidMachineWon {
+            bidmachineBanner.map { BidMachineSdk.shared.notifyMediationWin($0) }
             switchState(to: .loaded)
-        default:
-            switchState(to: .idle)
+        } else {
+            bidmachineBanner.map { BidMachineSdk.shared.notifyMediationLoss("", 0.0, $0) }
+            bidmachineBanner = nil
 
-            // fallback to google banner
+            // BidMachine lost. Fallback to Google native ad or implement your own fallback logic.
+            switchState(to: .idle)
             showAlert(with: "Google ad loaded with name: \(name)")
         }
     }
 }
 
 extension BannerViewController: GADBannerViewDelegate {
+    func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
+
+    }
+
     func bannerView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: any Error) {
         switchState(to: .idle)
         showAlert(with: "Error occurred: \(error.localizedDescription)")
+    }
+    
+    func bannerViewDidRecordImpression(_ bannerView: GADBannerView) {
+
     }
 }
