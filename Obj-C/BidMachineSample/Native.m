@@ -46,8 +46,8 @@
         [self layoutBidMachineNativeView];
         return;
     }
-    // No BidMachine native to show.
-    // Fallback to Google native ad (instructions: https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced) or implement your own fallback logic.
+    // No BidMachine native to show. Fallback to Google native ad or implement your own fallback logic.
+    // Google native ad instructions: https://developers.google.com/ad-manager/mobile-ads-sdk/ios/native/advanced)
 }
 
 - (void)viewDidLoad {
@@ -150,6 +150,8 @@
 - (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
     [self switchState: BSStateIdle];
     [self deleteLoadedAd];
+    
+    // BidMachine ad has expired. Restart the ad loading process.
 }
 
 - (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
@@ -176,6 +178,7 @@
 
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(NSError *)error {
     [self switchState:BSStateIdle];
+    // Unable to load Google ad, implement fallback logic.
 }
 
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveNativeAd:(GADNativeAd *)nativeAd {

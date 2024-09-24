@@ -74,6 +74,9 @@
 
 - (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     [self switchState:BSStateIdle];
+    self.bidMachineRewarded = nil;
+    
+    // Unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
 }
 
 - (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
@@ -88,6 +91,7 @@
     [self switchState: BSStateIdle];
     [self deleteLoadedAd];
     
+    // BidMachine ad has expired. Restart the ad loading process.
 }
 
 - (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {

@@ -103,6 +103,8 @@
 - (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
     [self deleteLoadedAd];
     [self switchState:BSStateIdle];
+    
+    // BidMachine ad has expired. Restart the ad loading process.
 }
 
 - (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
@@ -142,6 +144,8 @@
 - (void)bannerViewDidRecordImpression:(nonnull GADBannerView *)bannerView {
     
 }
+
+#pragma mark - GADAppEventDelegate
 
 - (void)adView:(nonnull GADBannerView *)banner didReceiveAppEvent:(nonnull NSString *)name withInfo:(nullable NSString *)info {
     BOOL bidMachineWon = [name isEqualToString:@"bidmachine-banner"];

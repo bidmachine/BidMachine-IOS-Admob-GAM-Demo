@@ -80,6 +80,8 @@ final class NativeViewController: AdLoadController {
                 adView.trailingAnchor.constraint(equalTo: nativeViewContainer.trailingAnchor)
             ])
         } catch let error {
+            // Unable to display the BidMachine ad. Implement your fallback logic here.
+
             switchState(to: .idle)
             showAlert(with: "Error occurred: \(error.localizedDescription)")
         }
@@ -174,7 +176,7 @@ extension NativeViewController: GADNativeAdLoaderDelegate {
             // BidMachine lost. Fallback to Google native ad or implement your own fallback logic.
             googleNativeAd = nativeAd
             switchState(to: .idle)
-            showAlert(with: "Google ad loaded. Advertiser: \(nativeAd.advertiser ?? "none")")
+            showAlert(with: "Google ad loaded. Advertiser: \(nativeAd.advertiser ?? "unknown")")
         }
     }
 
