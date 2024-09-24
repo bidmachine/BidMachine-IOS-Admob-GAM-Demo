@@ -1,14 +1,11 @@
 //
-//  NativeAdView.swift
-//
 //  Copyright © 2024 Appodeal. All rights reserved.
 //
 
 import UIKit
 import BidMachine
 
-@objc
-public class NativeAdView: UIView {
+final class NativeAdView: UIView {
     private let _titleLabel = UILabel()
     private let _descriptionLabel = UILabel()
     private let _callToActionLabel = UILabel()

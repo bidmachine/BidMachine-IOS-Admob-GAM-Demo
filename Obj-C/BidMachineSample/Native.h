@@ -5,7 +5,7 @@
 //
 
 #import "Base.h"
-#import "BidMachineSample-Swift.h"
+#import "BMNativeAdView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

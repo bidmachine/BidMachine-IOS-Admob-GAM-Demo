@@ -18,6 +18,7 @@
 @implementation Interstitial
 
 - (void)loadAd:(id)sender {
+    [self deleteLoadedAd];
     [self switchState:BSStateLoading];
     
     __weak typeof(self) weakSelf = self;
@@ -35,7 +36,18 @@
 
 - (void)showAd:(id)sender {
     [self switchState:BSStateIdle];
-    [self.bidmachineInterstitial presentAd];
+    
+    if (self.bidmachineInterstitial && self.bidmachineInterstitial.canShow) {
+        [self.bidmachineInterstitial presentAd];
+        return;
+    }
+    
+    // No BidMachine interstitial to show. Fallback to Google native ad or implement your own fallback logic.
+}
+
+- (void)deleteLoadedAd {
+    self.bidmachineInterstitial = nil;
+    self.googleInterstitial = nil;
 }
 
 #pragma mark - BidMachineAdDelegate
@@ -62,6 +74,9 @@
 
 - (void)didFailLoadAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
     [self switchState:BSStateIdle];
+    self.bidmachineInterstitial = nil;
+    
+    // Unable to load BidMachine ad, fallback to Google Ad manager request or handle error accordingly
 }
 
 - (void)didDismissAd:(id<BidMachineAdProtocol> _Nonnull)ad {
@@ -73,7 +88,10 @@
 }
 
 - (void)didExpired:(id<BidMachineAdProtocol> _Nonnull)ad {
+    [self switchState: BSStateIdle];
+    [self deleteLoadedAd];
     
+    // BidMachine ad has expired. Restart the ad loading process.
 }
 
 - (void)didFailPresentAd:(id<BidMachineAdProtocol> _Nonnull)ad :(NSError * _Nonnull)error {
@@ -105,10 +123,16 @@
 - (void)interstitialAd:(nonnull GADInterstitialAd *)interstitialAd
     didReceiveAppEvent:(nonnull NSString *)name
               withInfo:(nullable NSString *)info {
+    BOOL bidMachineWon = [name isEqualToString:@"bidmachine-interstitial"];
     
-    if ([name isEqualToString:@"bidmachine-interstitial"]) {
+    if (bidMachineWon) {
+        [BidMachineSdk.shared notifyMediationWin:self.bidmachineInterstitial];
         [self switchState:BSStateReady];
     } else {
+        [BidMachineSdk.shared notifyMediationLoss:@"" ecpm:0.0 ad:self.bidmachineInterstitial];
+        self.bidmachineInterstitial = nil;
+
+        // BidMachine lost. Fallback to Google native ad or implement your own fallback logic.
         [self switchState:BSStateIdle];
     }
 }
